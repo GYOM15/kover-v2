@@ -46,7 +46,7 @@ void load_scene_from_stdin(struct Scene* scene) {
   int num_lines = 0;
   while (fgets(line, MAX_LENGTH, stdin) != NULL)
     ++num_lines;
-  scene->num_buildings = num_lines == 2 ? 0 : 1;
+  scene->num_buildings = num_lines - 2;
   if (num_lines != 2) {
     strncpy(scene->buildings[0].id, "b1", MAX_LENGTH_ID);
     scene->buildings[0].x = 0;

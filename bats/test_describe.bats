@@ -12,7 +12,7 @@ setup() {
   assert_output "An empty scene"
 }
 
-@test "kover describe runs correctly on a scene with one building" {
+@test "kover describe runs correctly on a scene with 1 building" {
   run kover describe < "$examples_dir"/1b.scene
   assert_success
   assert_line --index 0 "A scene with 1 building"

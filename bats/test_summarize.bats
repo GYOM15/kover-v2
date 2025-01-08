@@ -12,8 +12,14 @@ setup() {
   assert_output "An empty scene"
 }
 
-@test "kover summarize runs correctly on a scene with one building" {
+@test "kover summarize runs correctly on a scene with 1 building" {
   run kover summarize < "$examples_dir"/1b.scene
   assert_success
   assert_output "A scene with 1 building"
+}
+
+@test "kover summarize runs correctly on a scene with 2 buildings" {
+  run kover summarize < "$examples_dir"/2b.scene
+  assert_success
+  assert_output "A scene with 2 buildings"
 }
