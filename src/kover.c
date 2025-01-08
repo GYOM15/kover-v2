@@ -25,6 +25,29 @@ void load_scene_from_stdin(struct Scene* scene) {
   scene->num_buildings = num_lines == 2 ? 0 : 1;
 }
 
+/**
+ * Prints a summary of the scene on stdout
+ *
+ * @param scene  The scene to print
+ */
+void print_scene_summary(const struct Scene* scene) {
+  if (scene->num_buildings == 0)
+    puts("An empty scene");
+  else
+    printf("A scene with %d building%s\n", scene->num_buildings,
+           scene->num_buildings > 1 ? "s" : "");
+}
+
+/**
+ * Prints the building of the scene to stdout
+ *
+ * @param scene  The scene whose building are printed
+ */
+void print_scene_buildings(const struct Scene* scene) {
+  if (scene->num_buildings != 0)
+    puts("  building b1 at 0 0 with dimensions 1 1");
+}
+
 // Subcommands processing
 // ----------------------
 
@@ -34,11 +57,7 @@ void load_scene_from_stdin(struct Scene* scene) {
 void run_summarize_subcommand() {
   struct Scene scene;
   load_scene_from_stdin(&scene);
-  if (scene.num_buildings == 0)
-    puts("An empty scene");
-  else
-    printf("A scene with %d building%s\n", scene.num_buildings,
-           scene.num_buildings > 1 ? "s" : "");
+  print_scene_summary(&scene);
 }
 
 /**
@@ -47,13 +66,8 @@ void run_summarize_subcommand() {
 void run_describe_subcommand() {
   struct Scene scene;
   load_scene_from_stdin(&scene);
-  if (scene.num_buildings == 0)
-    puts("An empty scene");
-  else {
-    printf("A scene with %d building%s\n", scene.num_buildings,
-           scene.num_buildings > 1 ? "s" : "");
-    puts("  building b1 at 0 0 with dimensions 1 1");
-  }
+  print_scene_summary(&scene);
+  print_scene_buildings(&scene);
 }
 
 // Main function
