@@ -2,3 +2,4 @@
 
 test:
 	bats-core/bin/bats test_summarize.bats
+	bats-core/bin/bats test_describe.bats
