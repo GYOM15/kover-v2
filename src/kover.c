@@ -37,23 +37,53 @@ struct Scene {
 // ------
 
 /**
+ * Initializes an empty scene
+ *
+ * @param scene  The scene to initialize
+ */
+void initialize_empty_scene(struct Scene* scene) {
+  scene->num_buildings = 0;
+}
+
+/**
+ * Adds a building to a scene
+ *
+ * @param scene  The scene to which the building is added
+ * @param id     The identifier of the building
+ * @param x      The x coordinate of the building
+ * @param y      The y coordinate of the building
+ * @param rx     The x radius of the building
+ * @param ry     The y radius of the building
+ */
+void add_building(struct Scene* scene,
+                  const char* id,
+                  int x,
+                  int y,
+                  int rx,
+                  int ry) {
+  struct Building* building = scene->buildings + scene->num_buildings;
+  strncpy(building->id, id, MAX_LENGTH_ID);
+  building->x = x;
+  building->y = y;
+  building->rx = rx;
+  building->ry = ry;
+  ++scene->num_buildings;
+}
+
+/**
  * Loads a scene from the standard input
  *
  * @param scene  The resulting scene
  */
 void load_scene_from_stdin(struct Scene* scene) {
+  initialize_empty_scene(scene);
   char line[MAX_LENGTH + 1];
   int num_lines = 0;
   while (fgets(line, MAX_LENGTH, stdin) != NULL)
     ++num_lines;
-  scene->num_buildings = num_lines - 2;
-  if (num_lines != 2) {
-    strncpy(scene->buildings[0].id, "b1", MAX_LENGTH_ID);
-    scene->buildings[0].x = 0;
-    scene->buildings[0].y = 0;
-    scene->buildings[0].rx = 1;
-    scene->buildings[0].ry = 1;
-  }
+  unsigned int num_buildings = num_lines - 2;
+  for (int b = 0; b < num_buildings; ++b)
+    add_building(scene, "b1", 0, 0, 1, 1);
 }
 
 /**
