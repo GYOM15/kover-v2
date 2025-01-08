@@ -1,16 +1,40 @@
 #include <stdio.h>
 #include <string.h>
 
+// The maximum length of a line in a scene stream
 #define MAX_LENGTH 50
+// The maximum length of an identifier
+#define MAX_LENGTH_ID 10
+// The maximum number of buildings in a scene
+#define NUM_MAX_BUILDINGS 100
 
-// Scenes
-// ------
+// Types
+// -----
+
+// A building
+struct Building {
+  // The identifier of the building
+  char id[MAX_LENGTH_ID + 1];
+  // The x coordinate of the building
+  int x;
+  // The y coordinate of the building
+  int y;
+  // The x radius of the building (half length in x direction)
+  int rx;
+  // The y radius of the building (half length in y direction)
+  int ry;
+};
 
 // A scene
 struct Scene {
   // The number of building in the scene
   unsigned int num_buildings;
+  // The buildings of the scene
+  struct Building buildings[NUM_MAX_BUILDINGS];
 };
+
+// Scenes
+// ------
 
 /**
  * Loads a scene from the standard input
@@ -23,6 +47,13 @@ void load_scene_from_stdin(struct Scene* scene) {
   while (fgets(line, MAX_LENGTH, stdin) != NULL)
     ++num_lines;
   scene->num_buildings = num_lines == 2 ? 0 : 1;
+  if (num_lines != 2) {
+    strncpy(scene->buildings[0].id, "b1", MAX_LENGTH_ID);
+    scene->buildings[0].x = 0;
+    scene->buildings[0].y = 0;
+    scene->buildings[0].rx = 1;
+    scene->buildings[0].ry = 1;
+  }
 }
 
 /**
@@ -44,8 +75,11 @@ void print_scene_summary(const struct Scene* scene) {
  * @param scene  The scene whose building are printed
  */
 void print_scene_buildings(const struct Scene* scene) {
-  if (scene->num_buildings != 0)
-    puts("  building b1 at 0 0 with dimensions 1 1");
+  for (int b = 0; b < scene->num_buildings; ++b) {
+    const struct Building* building = scene->buildings + b;
+    printf("  building %s at %d %d with dimensions %d %d\n",
+           building->id, building->x, building->y, building->rx, building->ry);
+  }
 }
 
 // Subcommands processing
