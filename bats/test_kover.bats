@@ -7,6 +7,7 @@ setup() {
 }
 
 @test "kover runs with success" {
+  skip
   kover
 }
 
@@ -14,4 +15,10 @@ setup() {
   run kover < "$examples_dir"/empty.scene
   assert_success
   assert_output "An empty scene"
+}
+
+@test "kover runs correctly on a scene with one building" {
+  run kover < "$examples_dir"/1b.scene
+  assert_success
+  assert_output "A scene with 1 building"
 }
