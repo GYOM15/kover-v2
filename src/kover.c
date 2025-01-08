@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 int main(void) {
-  puts("kover");
+  puts("An empty scene");
   return 0;
 }
