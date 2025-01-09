@@ -1,4 +1,5 @@
 .PHONY: test
 
 test:
-	bats-core/bin/bats test_kover.bats
+	bats-core/bin/bats test_summarize.bats
+	bats-core/bin/bats test_describe.bats
