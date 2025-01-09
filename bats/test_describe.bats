@@ -19,10 +19,27 @@ setup() {
   assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
 }
 
-@test "kover describe runs correctly on a scene with 2 building" {
+@test "kover describe runs correctly on a scene with 2 buildings" {
   run kover describe < "$examples_dir"/2b.scene
   assert_success
   assert_line --index 0 "A scene with 2 buildings"
   assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
   assert_line --index 2 "  building b2 at 5 8 with dimensions 2 3"
+}
+
+@test "kover describe runs correctly on a scene with 2 buildings in reverse order" {
+  run kover describe < "$examples_dir"/2b_rev.scene
+  assert_success
+  assert_line --index 0 "A scene with 2 buildings"
+  assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
+  assert_line --index 2 "  building b2 at 5 8 with dimensions 2 3"
+}
+
+@test "kover describe runs correctly on a scene with 3 buildings in reverse order" {
+  run kover describe < "$examples_dir"/3b_rev.scene
+  assert_success
+  assert_line --index 0 "A scene with 3 buildings"
+  assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
+  assert_line --index 2 "  building b2 at 5 8 with dimensions 2 3"
+  assert_line --index 3 "  building b3 at -2 -2 with dimensions 1 1"
 }

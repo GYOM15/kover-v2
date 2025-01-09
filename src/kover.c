@@ -55,7 +55,13 @@ void initialize_empty_scene(struct Scene* scene) {
  * @param building  The building to add
  */
 void add_building(struct Scene* scene, const struct Building* building) {
-  struct Building* scene_building = scene->buildings + scene->num_buildings;
+  unsigned int b = 0;
+  while (b < scene->num_buildings &&
+         strcmp(building->id, scene->buildings[b].id) > 0)
+    ++b;
+  for (int b2 = scene->num_buildings; b2 > b; --b2)
+    scene->buildings[b2] = scene->buildings[b2 - 1];
+  struct Building* scene_building = scene->buildings + b;
   strncpy(scene_building->id, building->id, MAX_LENGTH_ID);
   scene_building->x = building->x;
   scene_building->y = building->y;
