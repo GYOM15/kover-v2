@@ -83,7 +83,10 @@ void load_scene_from_stdin(struct Scene* scene) {
     ++num_lines;
   unsigned int num_buildings = num_lines - 2;
   for (int b = 0; b < num_buildings; ++b)
-    add_building(scene, "b1", 0, 0, 1, 1);
+    if (b == 0)
+      add_building(scene, "b1", 0, 0, 1, 1);
+    else if (b == 1)
+      add_building(scene, "b2", 5, 8, 2, 3);
 }
 
 /**

@@ -18,3 +18,11 @@ setup() {
   assert_line --index 0 "A scene with 1 building"
   assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
 }
+
+@test "kover describe runs correctly on a scene with 2 building" {
+  run kover describe < "$examples_dir"/2b.scene
+  assert_success
+  assert_line --index 0 "A scene with 2 buildings"
+  assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
+  assert_line --index 2 "  building b2 at 5 8 with dimensions 2 3"
+}
