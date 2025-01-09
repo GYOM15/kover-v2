@@ -51,25 +51,16 @@ void initialize_empty_scene(struct Scene* scene) {
 /**
  * Adds a building to a scene
  *
- * @param scene  The scene to which the building is added
- * @param id     The identifier of the building
- * @param x      The x coordinate of the building
- * @param y      The y coordinate of the building
- * @param rx     The x radius of the building
- * @param ry     The y radius of the building
+ * @param scene     The scene to which the building is added
+ * @param building  The building to add
  */
-void add_building(struct Scene* scene,
-                  const char* id,
-                  int x,
-                  int y,
-                  int rx,
-                  int ry) {
-  struct Building* building = scene->buildings + scene->num_buildings;
-  strncpy(building->id, id, MAX_LENGTH_ID);
-  building->x = x;
-  building->y = y;
-  building->rx = rx;
-  building->ry = ry;
+void add_building(struct Scene* scene, const struct Building* building) {
+  struct Building* scene_building = scene->buildings + scene->num_buildings;
+  strncpy(scene_building->id, building->id, MAX_LENGTH_ID);
+  scene_building->x = building->x;
+  scene_building->y = building->y;
+  scene_building->rx = building->rx;
+  scene_building->ry = building->ry;
   ++scene->num_buildings;
 }
 
@@ -139,6 +130,41 @@ bool is_building_line(const char* line) {
 }
 
 /**
+ * Loads a building from a line
+ *
+ * @param building  The loaded building
+ * @param line      The line
+ */
+void load_building_from_line(struct Building* building, const char* line) {
+  char line_copy[MAX_LENGTH + 1];
+  strncpy(line_copy, line, MAX_LENGTH);
+  char *token;
+  // 1st token should be building
+  token = strtok(line_copy, " ");
+  if (token == NULL || strcmp(token, "building") != 0) return;
+  // 2nd token should be the identifier
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  strncpy(building->id, token, MAX_LENGTH_ID);
+  // 3rd token should be x
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  building->x = atoi(token);
+  // 4th token should be y
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  building->y = atoi(token);
+  // 5th token should be rx
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  building->rx = atoi(token);
+  // 6th token should be ry
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  building->ry = atoi(token);
+}
+
+/**
  * Loads a scene from the standard input
  *
  * @param scene  The resulting scene
@@ -147,7 +173,7 @@ void load_scene_from_stdin(struct Scene* scene) {
   initialize_empty_scene(scene);
   char line[MAX_LENGTH + 1];
   bool first_line = true;
-  unsigned int num_buildings = 0;
+  struct Building building;
   while (fgets(line, MAX_LENGTH, stdin) != NULL) {
     line[strcspn(line, "\n")] = '\0';
     if (first_line) {
@@ -155,18 +181,14 @@ void load_scene_from_stdin(struct Scene* scene) {
         exit(1);
       first_line = false;
     } else if (is_building_line(line)) {
-      ++num_buildings;
+      load_building_from_line(&building, line);
+      add_building(scene, &building);
     } else if (is_end_scene_line(line)) {
       break;
     } else {
       exit(1);
     }
   }
-  for (int b = 0; b < num_buildings; ++b)
-    if (b == 0)
-      add_building(scene, "b1", 0, 0, 1, 1);
-    else if (b == 1)
-      add_building(scene, "b2", 5, 8, 2, 3);
 }
 
 // Subcommands processing
