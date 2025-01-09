@@ -1,4 +1,7 @@
+#include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // The maximum length of a line in a scene stream
@@ -71,25 +74,6 @@ void add_building(struct Scene* scene,
 }
 
 /**
- * Loads a scene from the standard input
- *
- * @param scene  The resulting scene
- */
-void load_scene_from_stdin(struct Scene* scene) {
-  initialize_empty_scene(scene);
-  char line[MAX_LENGTH + 1];
-  int num_lines = 0;
-  while (fgets(line, MAX_LENGTH, stdin) != NULL)
-    ++num_lines;
-  unsigned int num_buildings = num_lines - 2;
-  for (int b = 0; b < num_buildings; ++b)
-    if (b == 0)
-      add_building(scene, "b1", 0, 0, 1, 1);
-    else if (b == 1)
-      add_building(scene, "b2", 5, 8, 2, 3);
-}
-
-/**
  * Prints a summary of the scene on stdout
  *
  * @param scene  The scene to print
@@ -113,6 +97,76 @@ void print_scene_buildings(const struct Scene* scene) {
     printf("  building %s at %d %d with dimensions %d %d\n",
            building->id, building->x, building->y, building->rx, building->ry);
   }
+}
+
+// Scene loading
+// -------------
+
+/**
+ * Indicates if the line is a valid "begin scene" line
+ *
+ * @param line  The line to check
+ * @return      true if and only if the line is valid
+ */
+bool is_begin_scene_line(const char* line) {
+  return strcmp(line, "begin scene") == 0;
+}
+
+/**
+ * Indicates if the line is a valid "end scene" line
+ *
+ * @param line  The line to check
+ * @return      true if and only if the line is valid
+ */
+bool is_end_scene_line(const char* line) {
+  return strcmp(line, "end scene") == 0;
+}
+
+/**
+ * Indicates if the line is a building line
+ *
+ * A building line is a line that verifies the BRE regex
+ *
+ *   [:blank:]*building
+ *
+ * @param line  The line to check
+ * @return      true if and only if the line is valid
+ */
+bool is_building_line(const char* line) {
+  while (isblank(*line))
+    ++line;
+  return line != NULL && strncmp(line, "building", 8) == 0;
+}
+
+/**
+ * Loads a scene from the standard input
+ *
+ * @param scene  The resulting scene
+ */
+void load_scene_from_stdin(struct Scene* scene) {
+  initialize_empty_scene(scene);
+  char line[MAX_LENGTH + 1];
+  bool first_line = true;
+  unsigned int num_buildings = 0;
+  while (fgets(line, MAX_LENGTH, stdin) != NULL) {
+    line[strcspn(line, "\n")] = '\0';
+    if (first_line) {
+      if (!is_begin_scene_line(line))
+        exit(1);
+      first_line = false;
+    } else if (is_building_line(line)) {
+      ++num_buildings;
+    } else if (is_end_scene_line(line)) {
+      break;
+    } else {
+      exit(1);
+    }
+  }
+  for (int b = 0; b < num_buildings; ++b)
+    if (b == 0)
+      add_building(scene, "b1", 0, 0, 1, 1);
+    else if (b == 1)
+      add_building(scene, "b2", 5, 8, 2, 3);
 }
 
 // Subcommands processing
