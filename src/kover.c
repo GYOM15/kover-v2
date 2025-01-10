@@ -36,8 +36,8 @@ struct Scene {
   struct Building buildings[NUM_MAX_BUILDINGS];
 };
 
-// Scenes
-// ------
+// Scene construction
+// ------------------
 
 /**
  * Initializes an empty scene
@@ -202,6 +202,64 @@ void load_scene_from_stdin(struct Scene* scene) {
   }
 }
 
+// Scene validation
+// ----------------
+
+/**
+ * Indicates if two intervals are overlapping
+ *
+ * @param a1  The start of the first interval
+ * @param b1  The end of the first interval
+ * @param a2  The start of the second interval
+ * @param b2  The end of the second interval
+ */
+bool are_intervals_overlapping(int a1, int b1, int a2, int b2) {
+  return (a1 <= a2 && a2 < b1 && b1 <= b2) ||
+         (a2 <= a1 && a1 < b2 && b2 <= b1);
+}
+
+/**
+ * Indicates if two buildings are overlapping
+ *
+ * Two building are overlapping if their intersection has a strictly positive
+ * area.
+ *
+ * @param building1  The first building
+ * @param building2  The second building
+ */
+bool are_building_overlapping(const struct Building* building1,
+                              const struct Building* building2) {
+  return are_intervals_overlapping(building1->x - building1->rx,
+                                   building1->x + building1->rx,
+                                   building2->x - building2->rx,
+                                   building2->x + building2->rx) &&
+         are_intervals_overlapping(building1->y - building1->ry,
+                                   building1->y + building1->ry,
+                                   building2->y - building2->ry,
+                                   building2->y + building2->ry);
+}
+
+/**
+ * Checks if a scene is valid
+ *
+ * If the scene is invalid, an error is printed on stdout and the program exits
+ * with 1.
+ *
+ * @param scene  The scene to validate
+ */
+void validate_scene(const struct Scene* scene) {
+  for (int b1 = 0; b1 < scene->num_buildings; ++b1)
+    for (int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
+      const struct Building* building1 = scene->buildings + b1,
+                           * building2 = scene->buildings + b2;
+      if (are_building_overlapping(building1, building2)) {
+        fprintf(stderr, "error: buildings %s and %s are overlapping\n",
+                building1->id, building2->id);
+        exit(1);
+      }
+    }
+}
+
 // Subcommands processing
 // ----------------------
 
@@ -211,6 +269,7 @@ void load_scene_from_stdin(struct Scene* scene) {
 void run_summarize_subcommand() {
   struct Scene scene;
   load_scene_from_stdin(&scene);
+  validate_scene(&scene);
   print_scene_summary(&scene);
 }
 
@@ -220,6 +279,7 @@ void run_summarize_subcommand() {
 void run_describe_subcommand() {
   struct Scene scene;
   load_scene_from_stdin(&scene);
+  validate_scene(&scene);
   print_scene_summary(&scene);
   print_scene_buildings(&scene);
 }

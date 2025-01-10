@@ -55,3 +55,9 @@ setup() {
   assert_failure
   assert_output "error: building identifier b1 is non unique"
 }
+
+@test "kover describe reports an error when two buildings are overlapping" {
+  run kover describe < "$examples_dir"/2b_overlapping.invalid
+  assert_failure
+  assert_output "error: buildings b1 and b2 are overlapping"
+}
