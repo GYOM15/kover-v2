@@ -6,6 +6,9 @@ setup() {
   examples_dir="$root_dir/examples"
 }
 
+# Normal usage
+# ------------
+
 @test "kover describe runs correctly on an empty scene" {
   run kover describe < "$examples_dir"/empty.scene
   assert_success
@@ -42,4 +45,13 @@ setup() {
   assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
   assert_line --index 2 "  building b2 at 5 8 with dimensions 2 3"
   assert_line --index 3 "  building b3 at -2 -2 with dimensions 1 1"
+}
+
+# Wrong usage
+# -----------
+
+@test "kover describe reports an error when two buildings have same id" {
+  run kover describe < "$examples_dir"/2b_non_unique_id.invalid
+  assert_failure
+  assert_output "error: building identifier b1 is non unique"
 }

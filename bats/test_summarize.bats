@@ -6,6 +6,9 @@ setup() {
   examples_dir="$root_dir/examples"
 }
 
+# Normal usage
+# ------------
+
 @test "kover summarize runs correctly on an empty scene" {
   run kover summarize < "$examples_dir"/empty.scene
   assert_success
@@ -22,4 +25,13 @@ setup() {
   run kover summarize < "$examples_dir"/2b.scene
   assert_success
   assert_output "A scene with 2 buildings"
+}
+
+# Wrong usage
+# -----------
+
+@test "kover summarize reports an error when two buildings have same id" {
+  run kover summarize < "$examples_dir"/2b_non_unique_id.invalid
+  assert_failure
+  assert_output "error: building identifier b1 is non unique"
 }

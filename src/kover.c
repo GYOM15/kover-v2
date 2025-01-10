@@ -59,6 +59,11 @@ void add_building(struct Scene* scene, const struct Building* building) {
   while (b < scene->num_buildings &&
          strcmp(building->id, scene->buildings[b].id) > 0)
     ++b;
+  if (strcmp(building->id, scene->buildings[b].id) == 0) {
+    fprintf(stderr, "error: building identifier %s is non unique\n",
+            building->id);
+    exit(1);
+  }
   for (int b2 = scene->num_buildings; b2 > b; --b2)
     scene->buildings[b2] = scene->buildings[b2 - 1];
   struct Building* scene_building = scene->buildings + b;
