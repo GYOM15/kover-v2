@@ -231,13 +231,26 @@ void print_scene_summary(const struct Scene* scene) {
 /**
  * Prints the building of the scene to stdout
  *
- * @param scene  The scene whose building are printed
+ * @param scene  The scene whose buildings are printed
  */
 void print_scene_buildings(const struct Scene* scene) {
   for (int b = 0; b < scene->num_buildings; ++b) {
     const struct Building* building = scene->buildings + b;
     printf("  building %s at %d %d with dimensions %d %d\n",
            building->id, building->x, building->y, building->rx, building->ry);
+  }
+}
+
+/**
+ * Prints the antenna of the scene to stdout
+ *
+ * @param scene  The scene whose antennas are printed
+ */
+void print_scene_antennas(const struct Scene* scene) {
+  for (int a = 0; a < scene->num_antennas; ++a) {
+    const struct Antenna* antenna = scene->antennas + a;
+    printf("  antenna %s at %d %d with range %d\n",
+           antenna->id, antenna->x, antenna->y, antenna->r);
   }
 }
 
@@ -482,6 +495,7 @@ void run_describe_subcommand(void) {
   validate_scene(&scene);
   print_scene_summary(&scene);
   print_scene_buildings(&scene);
+  print_scene_antennas(&scene);
 }
 
 // Main function

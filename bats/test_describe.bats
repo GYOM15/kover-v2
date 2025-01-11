@@ -47,6 +47,13 @@ setup() {
   assert_line --index 3 "  building b3 at -2 -2 with dimensions 1 1"
 }
 
+@test "kover describe runs correctly on a scene with 1 antenna" {
+  run kover describe < "$examples_dir"/1a.scene
+  assert_success
+  assert_line --index 0 "A scene with 1 antenna"
+  assert_line --index 1 "  antenna a1 at 0 0 with range 1"
+}
+
 # Wrong usage
 # -----------
 
