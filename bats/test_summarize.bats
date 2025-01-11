@@ -30,6 +30,12 @@ setup() {
 # Wrong usage
 # -----------
 
+@test "kover summarize reports an error when first line is invalid" {
+  run kover summarize < "$examples_dir"/first_line.invalid
+  assert_failure
+  assert_output "error: first line must be exactly 'begin scene'"
+}
+
 @test "kover summarize reports an error when two buildings have same id" {
   run kover summarize < "$examples_dir"/2b_non_unique_id.invalid
   assert_failure

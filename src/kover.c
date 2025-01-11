@@ -220,8 +220,10 @@ void load_scene_from_stdin(struct Scene* scene) {
   while (fgets(line, MAX_LENGTH, stdin) != NULL) {
     line[strcspn(line, "\n")] = '\0';
     if (first_line) {
-      if (!is_begin_scene_line(line))
+      if (!is_begin_scene_line(line)) {
+        fprintf(stderr, "error: first line must be exactly 'begin scene'");
         exit(1);
+      }
       first_line = false;
     } else if (is_building_line(line)) {
       load_building_from_line(&building, line);
