@@ -62,7 +62,7 @@ setup() {
   assert_output "error: unrecognized line (line #2)"
 }
 
-@test "kover describe reports an error when last line is invalid" {
+@test "kover describe reports an error when last line is not 'end scene'" {
   run kover describe < "$examples_dir"/no_end_scene.invalid
   assert_failure
   assert_output "error: last line must be exactly 'end scene'"
