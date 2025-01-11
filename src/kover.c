@@ -68,6 +68,72 @@ struct Scene {
   struct Building buildings[NUM_MAX_BUILDINGS];
 };
 
+// Error reporting
+// ---------------
+
+/**
+ * Reports on stderr that a given building identifier is not unique
+ *
+ * @param id  The identifier
+ */
+void report_error_non_unique_building_identifiers(const char* id) {
+  fprintf(stderr, "error: building identifier %s is non unique\n", id);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that the first line of a scene is invalid
+ */
+void report_error_scene_first_line(void) {
+  fprintf(stderr, "error: first line must be exactly 'begin scene'\n");
+  exit(1);
+}
+
+/**
+ * Reports on stderr that a scene line is not recognized
+ *
+ * @param line_number  The number of the unrecognized line
+ */
+void report_error_unrecognized_line(int line_number) {
+  fprintf(stderr, "error: unrecognized line (line #%d)\n", line_number);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that the last line of a scene is invalid
+ */
+void report_error_scene_last_line(void) {
+  fprintf(stderr, "error: last line must be exactly 'end scene'\n");
+  exit(1);
+}
+
+/**
+ * Reports on stderr that two buildings are overlapping
+ *
+ * @param id1  The identifier of the first building
+ * @param id2  The identifier of the second building
+ */
+void report_error_overlapping_buildings(const char* id1, const char* id2) {
+  fprintf(stderr, "error: buildings %s and %s are overlapping\n", id1, id2);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that the subcommand is mandatory
+ */
+void report_error_mandatory_subcommand(void) {
+  fprintf(stderr, "error: subcommand is mandatory\n");
+  exit(1);
+}
+
+/**
+ * Reports on stderr that the subcommand is unrecognized
+ */
+void report_error_unrecognized_subcommand(const char* subcommand) {
+  fprintf(stderr, "error: subcommand '%s' is not recognized\n", subcommand);
+  exit(1);
+}
+
 // Scene construction
 // ------------------
 
@@ -91,11 +157,8 @@ void add_building(struct Scene* scene, const struct Building* building) {
   while (b < scene->num_buildings &&
          strcmp(building->id, scene->buildings[b].id) > 0)
     ++b;
-  if (strcmp(building->id, scene->buildings[b].id) == 0) {
-    fprintf(stderr, "error: building identifier %s is non unique\n",
-            building->id);
-    exit(1);
-  }
+  if (strcmp(building->id, scene->buildings[b].id) == 0)
+    report_error_non_unique_building_identifiers(building->id);
   for (int b2 = scene->num_buildings; b2 > b; --b2)
     scene->buildings[b2] = scene->buildings[b2 - 1];
   struct Building* scene_building = scene->buildings + b;
@@ -222,10 +285,8 @@ void load_scene_from_stdin(struct Scene* scene) {
     last_line = false;
     line[strcspn(line, "\n")] = '\0';
     if (first_line) {
-      if (!is_begin_scene_line(line)) {
-        fprintf(stderr, "error: first line must be exactly 'begin scene'\n");
-        exit(1);
-      }
+      if (!is_begin_scene_line(line))
+        report_error_scene_first_line();
       first_line = false;
     } else if (is_building_line(line)) {
       load_building_from_line(&building, line);
@@ -233,15 +294,12 @@ void load_scene_from_stdin(struct Scene* scene) {
     } else if (is_end_scene_line(line)) {
       last_line = true;
     } else {
-      fprintf(stderr, "error: unrecognized line (line #%d)\n", line_number);
-      exit(1);
+      report_error_unrecognized_line(line_number);
     }
     ++line_number;
   }
-  if (!last_line) {
-    fprintf(stderr, "error: last line must be exactly 'end scene'\n");
-    exit(1);
-  }
+  if (!last_line)
+    report_error_scene_last_line();
 }
 
 // Scene validation
@@ -294,11 +352,8 @@ void validate_scene(const struct Scene* scene) {
     for (int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
       const struct Building* building1 = scene->buildings + b1,
                            * building2 = scene->buildings + b2;
-      if (are_building_overlapping(building1, building2)) {
-        fprintf(stderr, "error: buildings %s and %s are overlapping\n",
-                building1->id, building2->id);
-        exit(1);
-      }
+      if (are_building_overlapping(building1, building2))
+        report_error_overlapping_buildings(building1->id, building2->id);
     }
 }
 
@@ -343,23 +398,18 @@ void run_describe_subcommand(void) {
  * @param argv  The arguments
  */
 int main(int argc, char* argv[]) {
-  if (argc < 2) {
-    fprintf(stderr, "error: subcommand is mandatory\n");
-    return 1;
-  }
+  if (argc < 2)
+    report_error_mandatory_subcommand();
   const char* subcommand = argv[1];
 
   if (strcmp(subcommand, "help") == 0) {
     print_help();
-    return 0;
   } else if (strcmp(subcommand, "summarize") == 0) {
     run_summarize_subcommand();
-    return 0;
   } else if (strcmp(subcommand, "describe") == 0) {
     run_describe_subcommand();
-    return 0;
   } else {
-    fprintf(stderr, "error: subcommand '%s' is not recognized\n", subcommand);
-    exit(1);
+    report_error_unrecognized_subcommand(subcommand);
   }
+  return 0;
 }
