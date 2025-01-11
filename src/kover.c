@@ -215,9 +215,10 @@ void load_building_from_line(struct Building* building, const char* line) {
 void load_scene_from_stdin(struct Scene* scene) {
   initialize_empty_scene(scene);
   char line[MAX_LENGTH + 1];
-  bool first_line = true;
+  bool first_line = true, last_line = false;
   struct Building building;
   while (fgets(line, MAX_LENGTH, stdin) != NULL) {
+    last_line = false;
     line[strcspn(line, "\n")] = '\0';
     if (first_line) {
       if (!is_begin_scene_line(line)) {
@@ -229,10 +230,14 @@ void load_scene_from_stdin(struct Scene* scene) {
       load_building_from_line(&building, line);
       add_building(scene, &building);
     } else if (is_end_scene_line(line)) {
-      break;
+      last_line = true;
     } else {
       exit(1);
     }
+  }
+  if (!last_line) {
+    fprintf(stderr, "error: last line must be exactly 'end scene'");
+    exit(1);
   }
 }
 

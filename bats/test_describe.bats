@@ -56,6 +56,12 @@ setup() {
   assert_output "error: first line must be exactly 'begin scene'"
 }
 
+@test "kover describe reports an error when last line is invalid" {
+  run kover describe < "$examples_dir"/no_end_scene.invalid
+  assert_failure
+  assert_output "error: last line must be exactly 'end scene'"
+}
+
 @test "kover describe reports an error when two buildings have same id" {
   run kover describe < "$examples_dir"/2b_non_unique_id.invalid
   assert_failure
