@@ -4,6 +4,38 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Constants
+// ---------
+
+// The help to display
+#define HELP "Usage: kover SUBCOMMAND\n\
+Handles positioning of communication antennas by reading a scene on stdin.\n\
+\n\
+SUBCOMMAND is mandatory and must take one of the following values:\n\
+  describe: describes the loaded scene in details\n\
+  help: shows this message\n\
+  summarize: summarizes the loaded scene\n\
+\n\
+A scene is a text stream that must satisfy the following syntax:\n\
+\n\
+  1. The first line must be exactly 'begin scene'\n\
+  2. The last line must be exactly 'end scene'\n\
+  3. Any line between the first and last line must either be a building line\n\
+     or an antenna line\n\
+  4. A building line can start with space characters, followed by an\n\
+     instruction of the form 'building ID X Y RX RY', where\n\
+       ID is the building identifier\n\
+       X is the x-coordinate of the building\n\
+       Y is the y-coordinate of the building\n\
+       RX is the x-radius of the building\n\
+       RY is the y-radius of the building\n\
+  5. An antenna line can start with space characters, followed by an\n\
+     instruction of the form 'antenna ID X Y R', where\n\
+       ID is the building identifier\n\
+       X is the x-coordinate of the antenna\n\
+       Y is the y-coordinate of the antenna\n\
+       R is the radius scope of the antenna\n"
+
 // The maximum length of a line in a scene stream
 #define MAX_LENGTH 50
 // The maximum length of an identifier
@@ -264,9 +296,16 @@ void validate_scene(const struct Scene* scene) {
 // ----------------------
 
 /**
+ * Prints the help on stdout
+ */
+void print_help(void) {
+  printf("%s", HELP);
+}
+
+/**
  * Runs the summarize subcommand
  */
-void run_summarize_subcommand() {
+void run_summarize_subcommand(void) {
   struct Scene scene;
   load_scene_from_stdin(&scene);
   validate_scene(&scene);
@@ -276,7 +315,7 @@ void run_summarize_subcommand() {
 /**
  * Runs the describe subcommand
  */
-void run_describe_subcommand() {
+void run_describe_subcommand(void) {
   struct Scene scene;
   load_scene_from_stdin(&scene);
   validate_scene(&scene);
@@ -298,7 +337,10 @@ int main(int argc, char* argv[]) {
     return 1;
   const char* subcommand = argv[1];
 
-  if (strcmp(subcommand, "summarize") == 0) {
+  if (strcmp(subcommand, "help") == 0) {
+    print_help();
+    return 0;
+  } else if (strcmp(subcommand, "summarize") == 0) {
     run_summarize_subcommand();
     return 0;
   } else if (strcmp(subcommand, "describe") == 0) {
