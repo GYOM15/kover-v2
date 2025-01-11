@@ -217,12 +217,13 @@ void load_scene_from_stdin(struct Scene* scene) {
   char line[MAX_LENGTH + 1];
   bool first_line = true, last_line = false;
   struct Building building;
+  int line_number = 1;
   while (fgets(line, MAX_LENGTH, stdin) != NULL) {
     last_line = false;
     line[strcspn(line, "\n")] = '\0';
     if (first_line) {
       if (!is_begin_scene_line(line)) {
-        fprintf(stderr, "error: first line must be exactly 'begin scene'");
+        fprintf(stderr, "error: first line must be exactly 'begin scene'\n");
         exit(1);
       }
       first_line = false;
@@ -232,11 +233,13 @@ void load_scene_from_stdin(struct Scene* scene) {
     } else if (is_end_scene_line(line)) {
       last_line = true;
     } else {
+      fprintf(stderr, "error: unrecognized line (line #%d)\n", line_number);
       exit(1);
     }
+    ++line_number;
   }
   if (!last_line) {
-    fprintf(stderr, "error: last line must be exactly 'end scene'");
+    fprintf(stderr, "error: last line must be exactly 'end scene'\n");
     exit(1);
   }
 }

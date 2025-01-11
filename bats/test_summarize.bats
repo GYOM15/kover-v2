@@ -36,6 +36,12 @@ setup() {
   assert_output "error: first line must be exactly 'begin scene'"
 }
 
+@test "kover summarize reports an error when a line is unrecognized" {
+  run kover summarize < "$examples_dir"/unrecognized_line.invalid
+  assert_failure
+  assert_output "error: unrecognized line (line #2)"
+}
+
 @test "kover summarize reports an error when last line is invalid" {
   run kover summarize < "$examples_dir"/no_end_scene.invalid
   assert_failure
