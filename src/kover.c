@@ -42,6 +42,8 @@ A scene is a text stream that must satisfy the following syntax:\n\
 #define MAX_LENGTH_ID 10
 // The maximum number of buildings in a scene
 #define NUM_MAX_BUILDINGS 100
+// The maximum number of antennas in a scene
+#define NUM_MAX_ANTENNAS 100
 
 // Types
 // -----
@@ -60,24 +62,41 @@ struct Building {
   int ry;
 };
 
+// An antenna
+struct Antenna {
+  // The identifier of the antenna
+  char id[MAX_LENGTH_ID + 1];
+  // The x coordinate of the antenna
+  int x;
+  // The y coordinate of the antenna
+  int y;
+  // The radius of the antenna
+  int r;
+};
+
 // A scene
 struct Scene {
   // The number of building in the scene
   unsigned int num_buildings;
   // The buildings of the scene
   struct Building buildings[NUM_MAX_BUILDINGS];
+  // The number of antennas in the scene
+  unsigned int num_antennas;
+  // The antennas of the scene
+  struct Antenna antennas[NUM_MAX_ANTENNAS];
 };
 
 // Error reporting
 // ---------------
 
 /**
- * Reports on stderr that a given building identifier is not unique
+ * Reports on stderr that a given object identifier is not unique
  *
- * @param id  The identifier
+ * @param object  The object
+ * @param id      The identifier
  */
-void report_error_non_unique_building_identifiers(const char* id) {
-  fprintf(stderr, "error: building identifier %s is non unique\n", id);
+void report_error_non_unique_identifiers(const char* object, const char* id) {
+  fprintf(stderr, "error: %s identifier %s is non unique\n", object, id);
   exit(1);
 }
 
@@ -158,7 +177,7 @@ void add_building(struct Scene* scene, const struct Building* building) {
          strcmp(building->id, scene->buildings[b].id) > 0)
     ++b;
   if (strcmp(building->id, scene->buildings[b].id) == 0)
-    report_error_non_unique_building_identifiers(building->id);
+    report_error_non_unique_identifiers("building", building->id);
   for (int b2 = scene->num_buildings; b2 > b; --b2)
     scene->buildings[b2] = scene->buildings[b2 - 1];
   struct Building* scene_building = scene->buildings + b;
@@ -171,16 +190,42 @@ void add_building(struct Scene* scene, const struct Building* building) {
 }
 
 /**
+ * Adds an antenna to a scene
+ *
+ * @param scene    The scene to which the antenna is added
+ * @param antenna  The antenna to add
+ */
+void add_antenna(struct Scene* scene, const struct Antenna* antenna) {
+  unsigned int a = 0;
+  while (a < scene->num_antennas &&
+         strcmp(antenna->id, scene->antennas[a].id) > 0)
+    ++a;
+  if (strcmp(antenna->id, scene->antennas[a].id) == 0)
+    report_error_non_unique_identifiers("antenna", antenna->id);
+  for (int a2 = scene->num_buildings; a2 > a; --a2)
+    scene->antennas[a2] = scene->antennas[a2 - 1];
+  struct Antenna* scene_antenna = scene->antennas + a;
+  strncpy(scene_antenna->id, antenna->id, MAX_LENGTH_ID);
+  scene_antenna->x = antenna->x;
+  scene_antenna->y = antenna->y;
+  scene_antenna->r = antenna->r;
+  ++scene->num_antennas;
+}
+
+/**
  * Prints a summary of the scene on stdout
  *
  * @param scene  The scene to print
  */
 void print_scene_summary(const struct Scene* scene) {
-  if (scene->num_buildings == 0)
+  if (scene->num_buildings == 0 && scene->num_antennas == 0)
     puts("An empty scene");
-  else
+  else if (scene->num_antennas == 0)
     printf("A scene with %d building%s\n", scene->num_buildings,
            scene->num_buildings > 1 ? "s" : "");
+  else if (scene->num_buildings == 0)
+    printf("A scene with %d antenna%s\n", scene->num_antennas,
+           scene->num_antennas > 1 ? "s" : "");
 }
 
 /**
@@ -222,9 +267,9 @@ bool is_end_scene_line(const char* line) {
 /**
  * Indicates if the line is a building line
  *
- * A building line is a line that verifies the BRE regex
+ * A building line is a line that matches the BRE regex
  *
- *   [:blank:]*building
+ *   ^[:blank:]*building
  *
  * @param line  The line to check
  * @return      true if and only if the line is valid
@@ -233,6 +278,22 @@ bool is_building_line(const char* line) {
   while (isblank(*line))
     ++line;
   return line != NULL && strncmp(line, "building", 8) == 0;
+}
+
+/**
+ * Indicates if the line is an antenna line
+ *
+ * An antenna line is a line that matches the BRE regex
+ *
+ *   ^[:blank:]*antenna
+ *
+ * @param line  The line to check
+ * @return      true if and only if the line is valid
+ */
+bool is_antenna_line(const char* line) {
+  while (isblank(*line))
+    ++line;
+  return line != NULL && strncmp(line, "antenna", 7) == 0;
 }
 
 /**
@@ -271,6 +332,37 @@ void load_building_from_line(struct Building* building, const char* line) {
 }
 
 /**
+ * Loads an antenna from a line
+ *
+ * @param antenna  The loaded antenna
+ * @param line     The line
+ */
+void load_antenna_from_line(struct Antenna* antenna, const char* line) {
+  char line_copy[MAX_LENGTH + 1];
+  strncpy(line_copy, line, MAX_LENGTH);
+  char *token;
+  // 1st token should be antenna
+  token = strtok(line_copy, " ");
+  if (token == NULL || strcmp(token, "antenna") != 0) return;
+  // 2nd token should be the identifier
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  strncpy(antenna->id, token, MAX_LENGTH_ID);
+  // 3rd token should be x
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  antenna->x = atoi(token);
+  // 4th token should be y
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  antenna->y = atoi(token);
+  // 5th token should be r
+  token = strtok(NULL, " ");
+  if (token == NULL) return;
+  antenna->r = atoi(token);
+}
+
+/**
  * Loads a scene from the standard input
  *
  * @param scene  The resulting scene
@@ -280,6 +372,7 @@ void load_scene_from_stdin(struct Scene* scene) {
   char line[MAX_LENGTH + 1];
   bool first_line = true, last_line = false;
   struct Building building;
+  struct Antenna antenna;
   int line_number = 1;
   while (fgets(line, MAX_LENGTH, stdin) != NULL) {
     last_line = false;
@@ -291,6 +384,9 @@ void load_scene_from_stdin(struct Scene* scene) {
     } else if (is_building_line(line)) {
       load_building_from_line(&building, line);
       add_building(scene, &building);
+    } else if (is_antenna_line(line)) {
+      load_antenna_from_line(&antenna, line);
+      add_antenna(scene, &antenna);
     } else if (is_end_scene_line(line)) {
       last_line = true;
     } else {
