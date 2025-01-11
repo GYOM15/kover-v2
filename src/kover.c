@@ -343,8 +343,10 @@ void run_describe_subcommand(void) {
  * @param argv  The arguments
  */
 int main(int argc, char* argv[]) {
-  if (argc < 2)
+  if (argc < 2) {
+    fprintf(stderr, "error: subcommand is mandatory\n");
     return 1;
+  }
   const char* subcommand = argv[1];
 
   if (strcmp(subcommand, "help") == 0) {
@@ -357,6 +359,6 @@ int main(int argc, char* argv[]) {
     run_describe_subcommand();
     return 0;
   } else {
-    return 1;
+    exit(1);
   }
 }
