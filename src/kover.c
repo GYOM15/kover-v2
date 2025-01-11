@@ -163,6 +163,7 @@ void report_error_unrecognized_subcommand(const char* subcommand) {
  */
 void initialize_empty_scene(struct Scene* scene) {
   scene->num_buildings = 0;
+  scene->num_antennas = 0;
 }
 
 /**
@@ -202,7 +203,7 @@ void add_antenna(struct Scene* scene, const struct Antenna* antenna) {
     ++a;
   if (strcmp(antenna->id, scene->antennas[a].id) == 0)
     report_error_non_unique_identifiers("antenna", antenna->id);
-  for (int a2 = scene->num_buildings; a2 > a; --a2)
+  for (int a2 = scene->num_antennas; a2 > a; --a2)
     scene->antennas[a2] = scene->antennas[a2 - 1];
   struct Antenna* scene_antenna = scene->antennas + a;
   strncpy(scene_antenna->id, antenna->id, MAX_LENGTH_ID);
@@ -218,14 +219,20 @@ void add_antenna(struct Scene* scene, const struct Antenna* antenna) {
  * @param scene  The scene to print
  */
 void print_scene_summary(const struct Scene* scene) {
-  if (scene->num_buildings == 0 && scene->num_antennas == 0)
+  if (scene->num_buildings == 0 && scene->num_antennas == 0) {
     puts("An empty scene");
-  else if (scene->num_antennas == 0)
-    printf("A scene with %d building%s\n", scene->num_buildings,
+    return;
+  }
+  printf("A scene with ");
+  if (scene->num_buildings > 0)
+    printf("%d building%s", scene->num_buildings,
            scene->num_buildings > 1 ? "s" : "");
-  else if (scene->num_buildings == 0)
-    printf("A scene with %d antenna%s\n", scene->num_antennas,
+  if (scene->num_buildings > 0 && scene->num_antennas > 0)
+    printf(" and ");
+  if (scene->num_antennas > 0)
+    printf("%d antenna%s", scene->num_antennas,
            scene->num_antennas > 1 ? "s" : "");
+  printf("\n");
 }
 
 /**

@@ -54,6 +54,30 @@ setup() {
   assert_line --index 1 "  antenna a1 at 0 0 with range 1"
 }
 
+@test "kover describe runs correctly on a scene with 2 antennas" {
+  run kover describe < "$examples_dir"/2a.scene
+  assert_success
+  assert_line --index 0 "A scene with 2 antennas"
+  assert_line --index 1 "  antenna a1 at 0 0 with range 1"
+  assert_line --index 2 "  antenna a2 at 2 3 with range 5"
+}
+
+@test "kover describe runs correctly on a scene with 2 antennas in reverse order" {
+  run kover describe < "$examples_dir"/2a_rev.scene
+  assert_success
+  assert_line --index 0 "A scene with 2 antennas"
+  assert_line --index 1 "  antenna a1 at 0 0 with range 1"
+  assert_line --index 2 "  antenna a2 at 2 3 with range 5"
+}
+
+@test "kover describe runs correctly on a scene with 1 building and 1 antenna" {
+  run kover describe < "$examples_dir"/1b1a.scene
+  assert_success
+  assert_line --index 0 "A scene with 1 building and 1 antenna"
+  assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
+  assert_line --index 2 "  antenna a1 at 2 3 with range 5"
+}
+
 # Wrong usage
 # -----------
 

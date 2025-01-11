@@ -33,6 +33,18 @@ setup() {
   assert_output "A scene with 1 antenna"
 }
 
+@test "kover summarize runs correctly on a scene with 2 antennas" {
+  run kover summarize < "$examples_dir"/2a.scene
+  assert_success
+  assert_output "A scene with 2 antennas"
+}
+
+@test "kover summarize runs correctly on a scene with 1 building and 1 antenna" {
+  run kover summarize < "$examples_dir"/1b1a.scene
+  assert_success
+  assert_output "A scene with 1 building and 1 antenna"
+}
+
 # Wrong usage
 # -----------
 
