@@ -4,6 +4,38 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Constants
+// ---------
+
+// The help to display
+#define HELP "Usage: kover SUBCOMMAND\n\
+Handles positioning of communication antennas by reading a scene on stdin.\n\
+\n\
+SUBCOMMAND is mandatory and must take one of the following values:\n\
+  describe: describes the loaded scene in details\n\
+  help: shows this message\n\
+  summarize: summarizes the loaded scene\n\
+\n\
+A scene is a text stream that must satisfy the following syntax:\n\
+\n\
+  1. The first line must be exactly 'begin scene'\n\
+  2. The last line must be exactly 'end scene'\n\
+  3. Any line between the first and last line must either be a building line\n\
+     or an antenna line\n\
+  4. A building line can start with space characters, followed by an\n\
+     instruction of the form 'building ID X Y RX RY', where\n\
+       ID is the building identifier\n\
+       X is the x-coordinate of the building\n\
+       Y is the y-coordinate of the building\n\
+       RX is the x-radius of the building\n\
+       RY is the y-radius of the building\n\
+  5. An antenna line can start with space characters, followed by an\n\
+     instruction of the form 'antenna ID X Y R', where\n\
+       ID is the building identifier\n\
+       X is the x-coordinate of the antenna\n\
+       Y is the y-coordinate of the antenna\n\
+       R is the radius scope of the antenna\n"
+
 // The maximum length of a line in a scene stream
 #define MAX_LENGTH 50
 // The maximum length of an identifier
@@ -36,8 +68,74 @@ struct Scene {
   struct Building buildings[NUM_MAX_BUILDINGS];
 };
 
-// Scenes
-// ------
+// Error reporting
+// ---------------
+
+/**
+ * Reports on stderr that a given building identifier is not unique
+ *
+ * @param id  The identifier
+ */
+void report_error_non_unique_building_identifiers(const char* id) {
+  fprintf(stderr, "error: building identifier %s is non unique\n", id);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that the first line of a scene is invalid
+ */
+void report_error_scene_first_line(void) {
+  fprintf(stderr, "error: first line must be exactly 'begin scene'\n");
+  exit(1);
+}
+
+/**
+ * Reports on stderr that a scene line is not recognized
+ *
+ * @param line_number  The number of the unrecognized line
+ */
+void report_error_unrecognized_line(int line_number) {
+  fprintf(stderr, "error: unrecognized line (line #%d)\n", line_number);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that the last line of a scene is invalid
+ */
+void report_error_scene_last_line(void) {
+  fprintf(stderr, "error: last line must be exactly 'end scene'\n");
+  exit(1);
+}
+
+/**
+ * Reports on stderr that two buildings are overlapping
+ *
+ * @param id1  The identifier of the first building
+ * @param id2  The identifier of the second building
+ */
+void report_error_overlapping_buildings(const char* id1, const char* id2) {
+  fprintf(stderr, "error: buildings %s and %s are overlapping\n", id1, id2);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that the subcommand is mandatory
+ */
+void report_error_mandatory_subcommand(void) {
+  fprintf(stderr, "error: subcommand is mandatory\n");
+  exit(1);
+}
+
+/**
+ * Reports on stderr that the subcommand is unrecognized
+ */
+void report_error_unrecognized_subcommand(const char* subcommand) {
+  fprintf(stderr, "error: subcommand '%s' is not recognized\n", subcommand);
+  exit(1);
+}
+
+// Scene construction
+// ------------------
 
 /**
  * Initializes an empty scene
@@ -59,6 +157,8 @@ void add_building(struct Scene* scene, const struct Building* building) {
   while (b < scene->num_buildings &&
          strcmp(building->id, scene->buildings[b].id) > 0)
     ++b;
+  if (strcmp(building->id, scene->buildings[b].id) == 0)
+    report_error_non_unique_building_identifiers(building->id);
   for (int b2 = scene->num_buildings; b2 > b; --b2)
     scene->buildings[b2] = scene->buildings[b2 - 1];
   struct Building* scene_building = scene->buildings + b;
@@ -178,43 +278,112 @@ void load_building_from_line(struct Building* building, const char* line) {
 void load_scene_from_stdin(struct Scene* scene) {
   initialize_empty_scene(scene);
   char line[MAX_LENGTH + 1];
-  bool first_line = true;
+  bool first_line = true, last_line = false;
   struct Building building;
+  int line_number = 1;
   while (fgets(line, MAX_LENGTH, stdin) != NULL) {
+    last_line = false;
     line[strcspn(line, "\n")] = '\0';
     if (first_line) {
       if (!is_begin_scene_line(line))
-        exit(1);
+        report_error_scene_first_line();
       first_line = false;
     } else if (is_building_line(line)) {
       load_building_from_line(&building, line);
       add_building(scene, &building);
     } else if (is_end_scene_line(line)) {
-      break;
+      last_line = true;
     } else {
-      exit(1);
+      report_error_unrecognized_line(line_number);
     }
+    ++line_number;
   }
+  if (!last_line)
+    report_error_scene_last_line();
+}
+
+// Scene validation
+// ----------------
+
+/**
+ * Indicates if two intervals are overlapping
+ *
+ * @param a1  The start of the first interval
+ * @param b1  The end of the first interval
+ * @param a2  The start of the second interval
+ * @param b2  The end of the second interval
+ */
+bool are_intervals_overlapping(int a1, int b1, int a2, int b2) {
+  return (a1 <= a2 && a2 < b1 && b1 <= b2) ||
+         (a2 <= a1 && a1 < b2 && b2 <= b1);
+}
+
+/**
+ * Indicates if two buildings are overlapping
+ *
+ * Two building are overlapping if their intersection has a strictly positive
+ * area.
+ *
+ * @param building1  The first building
+ * @param building2  The second building
+ */
+bool are_building_overlapping(const struct Building* building1,
+                              const struct Building* building2) {
+  return are_intervals_overlapping(building1->x - building1->rx,
+                                   building1->x + building1->rx,
+                                   building2->x - building2->rx,
+                                   building2->x + building2->rx) &&
+         are_intervals_overlapping(building1->y - building1->ry,
+                                   building1->y + building1->ry,
+                                   building2->y - building2->ry,
+                                   building2->y + building2->ry);
+}
+
+/**
+ * Checks if a scene is valid
+ *
+ * If the scene is invalid, an error is printed on stdout and the program exits
+ * with 1.
+ *
+ * @param scene  The scene to validate
+ */
+void validate_scene(const struct Scene* scene) {
+  for (int b1 = 0; b1 < scene->num_buildings; ++b1)
+    for (int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
+      const struct Building* building1 = scene->buildings + b1,
+                           * building2 = scene->buildings + b2;
+      if (are_building_overlapping(building1, building2))
+        report_error_overlapping_buildings(building1->id, building2->id);
+    }
 }
 
 // Subcommands processing
 // ----------------------
 
 /**
+ * Prints the help on stdout
+ */
+void print_help(void) {
+  printf("%s", HELP);
+}
+
+/**
  * Runs the summarize subcommand
  */
-void run_summarize_subcommand() {
+void run_summarize_subcommand(void) {
   struct Scene scene;
   load_scene_from_stdin(&scene);
+  validate_scene(&scene);
   print_scene_summary(&scene);
 }
 
 /**
  * Runs the describe subcommand
  */
-void run_describe_subcommand() {
+void run_describe_subcommand(void) {
   struct Scene scene;
   load_scene_from_stdin(&scene);
+  validate_scene(&scene);
   print_scene_summary(&scene);
   print_scene_buildings(&scene);
 }
@@ -230,16 +399,17 @@ void run_describe_subcommand() {
  */
 int main(int argc, char* argv[]) {
   if (argc < 2)
-    return 1;
+    report_error_mandatory_subcommand();
   const char* subcommand = argv[1];
 
-  if (strcmp(subcommand, "summarize") == 0) {
+  if (strcmp(subcommand, "help") == 0) {
+    print_help();
+  } else if (strcmp(subcommand, "summarize") == 0) {
     run_summarize_subcommand();
-    return 0;
   } else if (strcmp(subcommand, "describe") == 0) {
     run_describe_subcommand();
-    return 0;
   } else {
-    return 1;
+    report_error_unrecognized_subcommand(subcommand);
   }
+  return 0;
 }

@@ -6,6 +6,9 @@ setup() {
   examples_dir="$root_dir/examples"
 }
 
+# Normal usage
+# ------------
+
 @test "kover describe runs correctly on an empty scene" {
   run kover describe < "$examples_dir"/empty.scene
   assert_success
@@ -42,4 +45,37 @@ setup() {
   assert_line --index 1 "  building b1 at 0 0 with dimensions 1 1"
   assert_line --index 2 "  building b2 at 5 8 with dimensions 2 3"
   assert_line --index 3 "  building b3 at -2 -2 with dimensions 1 1"
+}
+
+# Wrong usage
+# -----------
+
+@test "kover describe reports an error when first line is invalid" {
+  run kover describe < "$examples_dir"/first_line.invalid
+  assert_failure
+  assert_output "error: first line must be exactly 'begin scene'"
+}
+
+@test "kover describe reports an error when a line is unrecognized" {
+  run kover describe < "$examples_dir"/unrecognized_line.invalid
+  assert_failure
+  assert_output "error: unrecognized line (line #2)"
+}
+
+@test "kover describe reports an error when last line is not 'end scene'" {
+  run kover describe < "$examples_dir"/no_end_scene.invalid
+  assert_failure
+  assert_output "error: last line must be exactly 'end scene'"
+}
+
+@test "kover describe reports an error when two buildings have same id" {
+  run kover describe < "$examples_dir"/2b_non_unique_id.invalid
+  assert_failure
+  assert_output "error: building identifier b1 is non unique"
+}
+
+@test "kover describe reports an error when two buildings are overlapping" {
+  run kover describe < "$examples_dir"/2b_overlapping.invalid
+  assert_failure
+  assert_output "error: buildings b1 and b2 are overlapping"
 }
