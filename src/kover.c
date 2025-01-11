@@ -359,6 +359,7 @@ int main(int argc, char* argv[]) {
     run_describe_subcommand();
     return 0;
   } else {
+    fprintf(stderr, "error: subcommand '%s' is not recognized\n", subcommand);
     exit(1);
   }
 }

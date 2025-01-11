@@ -13,3 +13,9 @@ setup() {
   assert_failure
   assert_output "error: subcommand is mandatory"
 }
+
+@test "kover with unrecognized subcommand reports wrong usage" {
+  run kover thing
+  assert_failure
+  assert_output "error: subcommand 'thing' is not recognized"
+}
