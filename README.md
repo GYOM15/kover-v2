@@ -51,16 +51,24 @@ syntaxe spécifique:
    `antenna` est en minuscules, `ID` est l'identifiant de l'antenne,
    (`X`, `Y`) est la position de l'antenne et `R` est la portée de l'antenne.
 
-Par exemple, le flux de texte suivant décrit une scène composée de deux
-buildings (identifiés par `b1` et `b2`) et d'une antenne (identifiée par `a`):
+Par exemple, le flux de texte suivant décrit une scène composée de trois
+buildings (identifiés par `b1`, `b2` et `b3`) et de deux antennes (identifiées
+par `a1` et `a2`):
 
 ```
 begin scene
   building b1 0 0 1 1
   building b2 7 8 2 3
-  antenna a 5 4 6
+  building b3 15 1 4 1
+  antenna a1 5 4 6
+  antenna a2 16 3 4
 end scene
 ```
+
+Une représentation graphique de la scène ci-haut est disponible dans le fichier
+SVG suivant:
+
+![Une scène de 3 buildings et 2 antennes](doc/scene.svg)
 
 L'application `kover` permet donc de manipuler des scènes et d'optimiser le
 positionnement d'antennes dans ces scènes afin de couvrir adéquatement les
