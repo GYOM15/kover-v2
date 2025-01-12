@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -167,6 +168,16 @@ void initialize_empty_scene(struct Scene* scene) {
 }
 
 /**
+ * Indicates if a scene is empty
+ *
+ * @param scene  The scene to check
+ * @return       true if and only if the given scene is empty
+ */
+bool scene_is_empty(const struct Scene* scene) {
+  return scene->num_buildings == 0 && scene->num_antennas == 0;
+}
+
+/**
  * Adds a building to a scene
  *
  * @param scene     The scene to which the building is added
@@ -259,6 +270,40 @@ void print_scene_antennas(const struct Scene* scene) {
     printf("  antenna %s at %d %d with range %d\n",
            antenna->id, antenna->x, antenna->y, antenna->r);
   }
+}
+
+/**
+ * Prints the bounding box of the scene to stdout
+ *
+ * @param scene  The scene whose bounding box is printed
+ */
+void print_scene_bounding_box(const struct Scene* scene) {
+  if (scene_is_empty(scene)) {
+    printf("undefined (empty scene)\n");
+    return;
+  }
+  int xmin = INT_MAX, xmax = INT_MIN,
+      ymin = INT_MAX, ymax = INT_MIN;
+  for (int b = 0; b < scene->num_buildings; ++b) {
+    int x = scene->buildings[b].x,
+        y = scene->buildings[b].y,
+        rx = scene->buildings[b].rx,
+        ry = scene->buildings[b].ry;
+    xmin = x - rx < xmin ? x - rx : xmin;
+    xmax = x + rx > xmax ? x + rx : xmax;
+    ymin = y - ry < ymin ? y - ry : ymin;
+    ymax = y + ry > ymax ? y + ry : ymax;
+  }
+  for (int a = 0; a < scene->num_antennas; ++a) {
+    int x = scene->antennas[a].x,
+        y = scene->antennas[a].y,
+        r = scene->antennas[a].r;
+    xmin = x - r < xmin ? x - r : xmin;
+    xmax = x + r > xmax ? x + r : xmax;
+    ymin = y - r < ymin ? y - r : ymin;
+    ymax = y + r > ymax ? y + r : ymax;
+  }
+  printf("bounding box [%d, %d] x [%d, %d]\n", xmin, xmax, ymin, ymax);
 }
 
 // Scene loading
@@ -477,6 +522,28 @@ void validate_scene(const struct Scene* scene) {
 // ----------------------
 
 /**
+ * Runs the bounding-box subcommand
+ */
+void run_bounding_box_subcommand(void) {
+  struct Scene scene;
+  load_scene_from_stdin(&scene);
+  validate_scene(&scene);
+  print_scene_bounding_box(&scene);
+}
+
+/**
+ * Runs the describe subcommand
+ */
+void run_describe_subcommand(void) {
+  struct Scene scene;
+  load_scene_from_stdin(&scene);
+  validate_scene(&scene);
+  print_scene_summary(&scene);
+  print_scene_buildings(&scene);
+  print_scene_antennas(&scene);
+}
+
+/**
  * Prints the help on stdout
  */
 void print_help(void) {
@@ -493,18 +560,6 @@ void run_summarize_subcommand(void) {
   print_scene_summary(&scene);
 }
 
-/**
- * Runs the describe subcommand
- */
-void run_describe_subcommand(void) {
-  struct Scene scene;
-  load_scene_from_stdin(&scene);
-  validate_scene(&scene);
-  print_scene_summary(&scene);
-  print_scene_buildings(&scene);
-  print_scene_antennas(&scene);
-}
-
 // Main function
 // -------------
 
@@ -519,12 +574,14 @@ int main(int argc, char* argv[]) {
     report_error_mandatory_subcommand();
   const char* subcommand = argv[1];
 
-  if (strcmp(subcommand, "help") == 0) {
+  if (strcmp(subcommand, "bounding-box") == 0) {
+    run_bounding_box_subcommand();
+  } else if (strcmp(subcommand, "describe") == 0) {
+    run_describe_subcommand();
+  } else if (strcmp(subcommand, "help") == 0) {
     print_help();
   } else if (strcmp(subcommand, "summarize") == 0) {
     run_summarize_subcommand();
-  } else if (strcmp(subcommand, "describe") == 0) {
-    run_describe_subcommand();
   } else {
     report_error_unrecognized_subcommand(subcommand);
   }
