@@ -65,11 +65,11 @@ Votre programme doit reconnaître les identifiants et les nombres entiers selon
 les contraintes suivantes:
 
 * Un *identifiant* est une chaîne de caractères qui a une correspondance
-  complète avec l'expression régulière `[a-zA-Z_][a-zA-Z0-9_]*`;
+  complète avec l'ERE `[a-zA-Z_][a-zA-Z0-9_]*`;
 * Un *entier* est une chaîne de caractères qui a une correspondance complète
-  avec l'expression régulière `0|([-]?[1-9][0-9]*)`;
+  avec l'ERE `0|([-]?[1-9][0-9]*)`;
 * Un *entier strictement positif* est une chaîne de caractères qui a une
-  correspondance complète avec l'expression régulière `[1-9][0-9]*`;
+  correspondance complète avec l'ERE `[1-9][0-9]*`;
 
 Par exemple, le flux de texte suivant décrit une scène valide composée de trois
 buildings (identifiés par `b1`, `b2` et `b3`) et de deux antennes (identifiées
