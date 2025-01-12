@@ -114,3 +114,39 @@ On peut aussi lancer la suite de tests Bats à l'aide de `make`:
 ```sh
 $ make test
 ```
+
+## Utilisation
+
+L'application `kover` supporte actuellement 3 sous-commandes.
+
+Elles sont présentées en ordre alphabétique dans les sous-sections suivantes.
+
+### `kover describe`
+
+La sous-commande `describe` permet de décrire en détails le contenu d'une scène
+lue sur l'entrée standard. Par exemple
+
+```sh
+$ kover describe < examples/1b1a.scene
+A scene with 1 building and 1 antenna
+  building b1 at 0 0 with dimensions 1 1
+  antenna a1 at 2 3 with range 5
+```
+
+### `kover help`
+
+Pour afficher l'aide, il suffit d'entrer la commande suivante:
+
+```sh
+$ kover help
+```
+
+### `kover summarize`
+
+On peut en tout temps avoir un résumé d'une scène à l'aide de la sous-commande
+`summarize`. Par exemple
+
+```sh
+$ kover summarize < examples/1b1a.scene
+A scene with 1 building and 1 antenna
+```
