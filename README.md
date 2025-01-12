@@ -1,7 +1,7 @@
 # `kover`: gestion du positionnement d'antennes de communication
 
 Ce dépôt contient les fichiers nécessaires à la construction d'une application
-en ligne de commande appelée `kover`, qui sert à optimiser le positionnement
+en ligne de commande appelée `kover`, qui vise à optimiser le positionnement
 d'antennes de communication pour une zone donnée.
 
 ## Introduction
@@ -70,8 +70,8 @@ SVG suivant:
 
 ![Une scène de 3 buildings et 2 antennes](doc/scene.svg)
 
-L'application `kover` permet donc de manipuler des scènes et d'optimiser le
-positionnement d'antennes dans ces scènes afin de couvrir adéquatement les
+L'application `kover` permet donc de manipuler des scènes et vise à optimiser
+le positionnement d'antennes dans ces scènes afin de couvrir adéquatement les
 buildings qui occupent cette scène.
 
 ## Installation
