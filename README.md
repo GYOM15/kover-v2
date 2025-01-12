@@ -68,6 +68,9 @@ end scene
 Une représentation graphique de la scène ci-haut est disponible dans le fichier
 SVG suivant:
 
+Des exemples de scènes valides et invalides sont donnés dans le répertoire
+[`examples`](examples).
+
 ![Une scène de 3 buildings et 2 antennes](doc/scene.svg)
 
 L'application `kover` permet donc de manipuler des scènes et vise à optimiser
