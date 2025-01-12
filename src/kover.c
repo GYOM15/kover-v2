@@ -13,6 +13,7 @@
 Handles positioning of communication antennas by reading a scene on stdin.\n\
 \n\
 SUBCOMMAND is mandatory and must take one of the following values:\n\
+  bounding-box: returns a bounding box of the loaded scene\n\
   describe: describes the loaded scene in details\n\
   help: shows this message\n\
   summarize: summarizes the loaded scene\n\
