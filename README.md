@@ -120,9 +120,19 @@ $ make test
 
 ## Utilisation
 
-L'application `kover` supporte actuellement 3 sous-commandes.
+L'application `kover` supporte actuellement 4 sous-commandes.
 
 Elles sont présentées en ordre alphabétique dans les sous-sections suivantes.
+
+### `kover bounding-box`
+
+La sous-commande `bounding-box` retourne les dimensions de la boîte englobante
+d'une scène lue sur l'entrée standard. Par exemple
+
+```sh
+$ kover bounding-box < examples/1b1a.scene
+bounding box [-3, 7] x [-2, 8]
+```
 
 ### `kover describe`
 
@@ -146,8 +156,8 @@ $ kover help
 
 ### `kover summarize`
 
-On peut en tout temps avoir un résumé d'une scène à l'aide de la sous-commande
-`summarize`. Par exemple
+On peut en tout temps avoir un résumé de la scène lue sur l'entrée standard
+à l'aide de la sous-commande `summarize`. Par exemple
 
 ```sh
 $ kover summarize < examples/1b1a.scene
