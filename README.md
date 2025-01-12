@@ -39,19 +39,39 @@ une portée décrivant un disque d'aire strictement positive. Finalement, une
 Pour décrire une scène à l'aide d'un flux de texte, on convient d'utiliser une
 syntaxe spécifique:
 
-1. La première ligne du texte doit être exactement `begin scene`, en minuscules;
-2. La dernière ligne du texte doit être exactement `end scene`, en minuscules;
+1. La première ligne du texte doit correspondre à l'expression régulière
+   étendue (ERE) `^begin scene$`;
+2. La dernière ligne du texte doit correspondre à l'ERE `^end scene$`;
 3. Chaque ligne entre la première ligne et la dernière ligne doit être une
-   ligne décrivant un *building* ou une ligne décrivant une *antenne*;
-4. Une ligne décrivant un building doit être de la forme `building ID X Y RX
-   RY`, où `building` est en minuscules, `ID` est l'identifiant du building,
-   (`X`, `Y`) est la position du building et (`RX`, `RY`) est une paire de
-   rayons horizontal et vertical;
-5. Une ligne décrivant une antenne doit être de la forme `antenna ID X Y R`, où
-   `antenna` est en minuscules, `ID` est l'identifiant de l'antenne,
-   (`X`, `Y`) est la position de l'antenne et `R` est la portée de l'antenne.
+   ligne de type *building* ou une ligne de type *antenne*;
+4. Une ligne de type *building* doit correspondre à l'ERE
+   `^[:blank:]*building ID X Y RX RY$`,
+   où
+    * `ID` est l'identifiant du building,
+    * (`X`, `Y`) est la position du building, `X` et `Y` étant des nombres
+      entiers et
+    * (`RX`, `RY`) est une paire de rayons horizontal et vertical, `RX` et
+      `RY` étant des nombres entiers strictement positifs;
+5. Une ligne décrivant une antenne correspondre à l'ERE
+   `^[:blank:]*antenna ID X Y R$`,
+   où
+    * `ID` est l'identifiant de l'antenne,
+    * (`X`, `Y`) est la position de l'antenne, où `X` et `Y` sont des nombres
+      entiers et
+    * `R` est la portée de l'antenne, qui est un nombre entier strictement
+      positif.
 
-Par exemple, le flux de texte suivant décrit une scène composée de trois
+Votre programme doit reconnaître les identifiants et les nombres entiers selon
+les contraintes suivantes:
+
+* Un *identifiant* est une chaîne de caractères qui a une correspondance
+  complète avec l'expression régulière `[a-zA-Z_][a-zA-Z0-9_]*`;
+* Un *entier* est une chaîne de caractères qui a une correspondance complète
+  avec l'expression régulière `0|([-]?[1-9][0-9]*)`;
+* Un *entier strictement positif* est une chaîne de caractères qui a une
+  correspondance complète avec l'expression régulière `[1-9][0-9]*`;
+
+Par exemple, le flux de texte suivant décrit une scène valide composée de trois
 buildings (identifiés par `b1`, `b2` et `b3`) et de deux antennes (identifiées
 par `a1` et `a2`):
 
