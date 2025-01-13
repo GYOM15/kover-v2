@@ -122,3 +122,15 @@ setup() {
   assert_failure
   assert_output 'error: invalid integer "02" (line #2)'
 }
+
+@test "kover summarize reports an error when a building line has an invalid w" {
+  run kover summarize < "$examples_dir"/1b_wrong_w.invalid
+  assert_failure
+  assert_output 'error: invalid positive integer "c" (line #2)'
+}
+
+@test "kover summarize reports an error when a building line has an invalid h" {
+  run kover summarize < "$examples_dir"/1b_wrong_h.invalid
+  assert_failure
+  assert_output 'error: invalid positive integer "-2" (line #2)'
+}

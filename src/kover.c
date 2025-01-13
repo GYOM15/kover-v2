@@ -152,6 +152,28 @@ bool is_valid_integer(const char* s) {
   return true;
 }
 
+/**
+ * Indicates if a string is a valid positive integer
+ *
+ * An string is a valid positive integer if it completely matches the BRE
+ *
+ *   [1-9][0-9]*
+ *
+ * @param s  The string to verify
+ * @return   true if and only if the string is a valid identifier
+ */
+bool is_valid_positive_integer(const char* s) {
+  if (*s < '1' || *s > '9')
+    return false;
+  ++s;
+  while (*s != '\0') {
+    if (!isdigit(*s))
+      return false;
+    ++s;
+  }
+  return true;
+}
+
 // Error reporting
 // ---------------
 
@@ -186,6 +208,18 @@ void report_error_invalid_identifier(const char* id, int line_number) {
  */
 void report_error_invalid_int(const char* s, int line_number) {
   fprintf(stderr, "error: invalid integer \"%s\" (line #%d)\n", s, line_number);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that a string is not a valid positive integer
+ *
+ * @param s            The string
+ * @param line_number  The line number
+ */
+void report_error_invalid_positive_int(const char* s, int line_number) {
+  fprintf(stderr, "error: invalid positive integer \"%s\" (line #%d)\n", s,
+          line_number);
   exit(1);
 }
 
@@ -490,6 +524,12 @@ bool load_building_from_parsed_line(const struct ParsedLine* parsed_line,
   if (!is_valid_integer(parsed_line->tokens[3]))
       report_error_invalid_int(parsed_line->tokens[3],
                                parsed_line->line_number);
+  if (!is_valid_positive_integer(parsed_line->tokens[4]))
+      report_error_invalid_positive_int(parsed_line->tokens[4],
+                                        parsed_line->line_number);
+  if (!is_valid_positive_integer(parsed_line->tokens[5]))
+      report_error_invalid_positive_int(parsed_line->tokens[5],
+                                        parsed_line->line_number);
   struct Building building;
   strncpy(building.id, parsed_line->tokens[1], MAX_LENGTH_ID);
   building.x = atoi(parsed_line->tokens[2]);
