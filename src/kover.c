@@ -46,6 +46,10 @@ A scene is a text stream that must satisfy the following syntax:\n\
 #define NUM_MAX_BUILDINGS 100
 // The maximum number of antennas in a scene
 #define NUM_MAX_ANTENNAS 100
+// The maximum number of tokens in a line
+#define MAX_NUM_TOKENS 6
+// The maximum lenght of a token in a line
+#define MAX_TOKEN_LENGTH 10
 
 // Types
 // -----
@@ -88,6 +92,88 @@ struct Scene {
   struct Antenna antennas[NUM_MAX_ANTENNAS];
 };
 
+// A parsed line
+struct ParsedLine {
+  // The number of parsed token
+  unsigned int num_tokens;
+  // The tokens
+  char tokens[MAX_NUM_TOKENS][MAX_TOKEN_LENGTH];
+  // The number of the line
+  int line_number;
+};
+
+// Validation
+// ----------
+
+/**
+ * Indicates if a string is a valid identifier
+ *
+ * An identifier is valid if it completely matches the BRE
+ *
+ *   [a-zA-Z_][a-zA-Z0-1_]*
+ *
+ * @param s  The string to verify
+ * @return   true if and only if the string is a valid identifier
+ */
+bool is_valid_id(const char* s) {
+  if (*s == '\0' || (!isalpha(*s) && *s != '_'))
+    return false;
+  while (*s != '\0') {
+    if (!isalnum(*s) && *s != '_')
+      return false;
+    ++s;
+  }
+  return true;
+}
+
+/**
+ * Indicates if a string is a valid integer
+ *
+ * An string is a valid integer if it completely matches the BRE
+ *
+ *   0|([-]?[1-9][0-9]*)
+ *
+ * @param s  The string to verify
+ * @return   true if and only if the string is a valid identifier
+ */
+bool is_valid_integer(const char* s) {
+  if (*s == '0' && *(s + 1) == '\0')
+    return true;
+  if (*s == '-')
+    ++s;
+  if (*s < '1' || *s > '9')
+    return false;
+  ++s;
+  while (*s != '\0') {
+    if (!isdigit(*s))
+      return false;
+    ++s;
+  }
+  return true;
+}
+
+/**
+ * Indicates if a string is a valid positive integer
+ *
+ * An string is a valid positive integer if it completely matches the BRE
+ *
+ *   [1-9][0-9]*
+ *
+ * @param s  The string to verify
+ * @return   true if and only if the string is a valid identifier
+ */
+bool is_valid_positive_integer(const char* s) {
+  if (*s < '1' || *s > '9')
+    return false;
+  ++s;
+  while (*s != '\0') {
+    if (!isdigit(*s))
+      return false;
+    ++s;
+  }
+  return true;
+}
+
 // Error reporting
 // ---------------
 
@@ -99,6 +185,41 @@ struct Scene {
  */
 void report_error_non_unique_identifiers(const char* object, const char* id) {
   fprintf(stderr, "error: %s identifier %s is non unique\n", object, id);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that an identifier is invalid
+ *
+ * @param id           The identifier
+ * @param line_number  The line number
+ */
+void report_error_invalid_identifier(const char* id, int line_number) {
+  fprintf(stderr, "error: invalid identifier \"%s\" (line #%d)\n", id,
+          line_number);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that a string is not a valid integer
+ *
+ * @param s            The string
+ * @param line_number  The line number
+ */
+void report_error_invalid_int(const char* s, int line_number) {
+  fprintf(stderr, "error: invalid integer \"%s\" (line #%d)\n", s, line_number);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that a string is not a valid positive integer
+ *
+ * @param s            The string
+ * @param line_number  The line number
+ */
+void report_error_invalid_positive_int(const char* s, int line_number) {
+  fprintf(stderr, "error: invalid positive integer \"%s\" (line #%d)\n", s,
+          line_number);
   exit(1);
 }
 
@@ -117,6 +238,21 @@ void report_error_scene_first_line(void) {
  */
 void report_error_unrecognized_line(int line_number) {
   fprintf(stderr, "error: unrecognized line (line #%d)\n", line_number);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that a building line has the wrong number of arguments
+ *
+ * @param object       The object on the line
+ * @param line_number  The number of the unrecognized line
+ */
+void report_error_line_wrong_arguments_number(const char* object,
+                                              int line_number) {
+  fprintf(stderr,
+          "error: %s line has wrong number of arguments (line #%d)\n",
+          object,
+          line_number);
   exit(1);
 }
 
@@ -146,7 +282,8 @@ void report_error_overlapping_buildings(const char* id1, const char* id2) {
  * @param id2  The identifier of the second antenna
  */
 void report_error_same_position_antennas(const char* id1, const char* id2) {
-  fprintf(stderr, "error: antennas %s and %s have the same position\n", id1, id2);
+  fprintf(stderr, "error: antennas %s and %s have the same position\n",
+          id1, id2);
   exit(1);
 }
 
@@ -342,101 +479,100 @@ bool is_end_scene_line(const char* line) {
 }
 
 /**
- * Indicates if the line is a building line
+ * Parses a line
  *
- * A building line is a line that matches the BRE regex
- *
- *   ^[:blank:]*building
- *
- * @param line  The line to check
- * @return      true if and only if the line is valid
+ * @param line         The line to parse
+ * @param parsed_line  The resulting parsed line
+ * @param line_number  The number of the line
  */
-bool is_building_line(const char* line) {
-  while (isblank(*line))
-    ++line;
-  return line != NULL && strncmp(line, "building", 8) == 0;
-}
-
-/**
- * Indicates if the line is an antenna line
- *
- * An antenna line is a line that matches the BRE regex
- *
- *   ^[:blank:]*antenna
- *
- * @param line  The line to check
- * @return      true if and only if the line is valid
- */
-bool is_antenna_line(const char* line) {
-  while (isblank(*line))
-    ++line;
-  return line != NULL && strncmp(line, "antenna", 7) == 0;
-}
-
-/**
- * Loads a building from a line
- *
- * @param building  The loaded building
- * @param line      The line
- */
-void load_building_from_line(struct Building* building, const char* line) {
+void parse_line(const char* line,
+                struct ParsedLine* parsed_line,
+                int line_number) {
   char line_copy[MAX_LENGTH + 1];
   strncpy(line_copy, line, MAX_LENGTH);
-  char *token;
-  // 1st token should be building
-  token = strtok(line_copy, " ");
-  if (token == NULL || strcmp(token, "building") != 0) return;
-  // 2nd token should be the identifier
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  strncpy(building->id, token, MAX_LENGTH_ID);
-  // 3rd token should be x
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  building->x = atoi(token);
-  // 4th token should be y
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  building->y = atoi(token);
-  // 5th token should be w
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  building->w = atoi(token);
-  // 6th token should be h
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  building->h = atoi(token);
+  char *token = strtok(line_copy, " ");
+  int t = 0;
+  while (token != NULL) {
+    strncpy(parsed_line->tokens[t], token, MAX_TOKEN_LENGTH);
+    ++t;
+    token = strtok(NULL, " ");
+  }
+  parsed_line->num_tokens = t;
+  parsed_line->line_number = line_number;
 }
 
 /**
- * Loads an antenna from a line
+ * Loads a building from a parsed line
  *
- * @param antenna  The loaded antenna
- * @param line     The line
+ * @param parsed_line  The parsed line
+ * @param scene        The scene in which the building is loaded
+ * @return             true if and only if the loading was successful
  */
-void load_antenna_from_line(struct Antenna* antenna, const char* line) {
-  char line_copy[MAX_LENGTH + 1];
-  strncpy(line_copy, line, MAX_LENGTH);
-  char *token;
-  // 1st token should be antenna
-  token = strtok(line_copy, " ");
-  if (token == NULL || strcmp(token, "antenna") != 0) return;
-  // 2nd token should be the identifier
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  strncpy(antenna->id, token, MAX_LENGTH_ID);
-  // 3rd token should be x
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  antenna->x = atoi(token);
-  // 4th token should be y
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  antenna->y = atoi(token);
-  // 5th token should be r
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  antenna->r = atoi(token);
+bool load_building_from_parsed_line(const struct ParsedLine* parsed_line,
+                                    struct Scene* scene) {
+  if (strcmp(parsed_line->tokens[0], "building") != 0)
+    return false;
+  if (parsed_line->num_tokens != 6)
+    report_error_line_wrong_arguments_number("building",
+                                             parsed_line->line_number);
+  if (!is_valid_id(parsed_line->tokens[1]))
+      report_error_invalid_identifier(parsed_line->tokens[1],
+                                      parsed_line->line_number);
+  if (!is_valid_integer(parsed_line->tokens[2]))
+      report_error_invalid_int(parsed_line->tokens[2],
+                               parsed_line->line_number);
+  if (!is_valid_integer(parsed_line->tokens[3]))
+      report_error_invalid_int(parsed_line->tokens[3],
+                               parsed_line->line_number);
+  if (!is_valid_positive_integer(parsed_line->tokens[4]))
+      report_error_invalid_positive_int(parsed_line->tokens[4],
+                                        parsed_line->line_number);
+  if (!is_valid_positive_integer(parsed_line->tokens[5]))
+      report_error_invalid_positive_int(parsed_line->tokens[5],
+                                        parsed_line->line_number);
+  struct Building building;
+  strncpy(building.id, parsed_line->tokens[1], MAX_LENGTH_ID);
+  building.x = atoi(parsed_line->tokens[2]);
+  building.y = atoi(parsed_line->tokens[3]);
+  building.w = atoi(parsed_line->tokens[4]);
+  building.h = atoi(parsed_line->tokens[5]);
+  add_building(scene, &building);
+  return true;
+}
+
+/**
+ * Loads an antenna from a parsed line
+ *
+ * @param parsed_line  The parsed line
+ * @param scene        The scene in which the antenna is loaded
+ * @return             true if and only if the loading was successful
+ */
+bool load_antenna_from_parsed_line(const struct ParsedLine* parsed_line,
+                                   struct Scene* scene) {
+  if (strcmp(parsed_line->tokens[0], "antenna") != 0)
+    return false;
+  if (parsed_line->num_tokens != 5)
+    report_error_line_wrong_arguments_number("antenna",
+                                             parsed_line->line_number);
+  if (!is_valid_id(parsed_line->tokens[1]))
+      report_error_invalid_identifier(parsed_line->tokens[1],
+                                      parsed_line->line_number);
+  if (!is_valid_integer(parsed_line->tokens[2]))
+      report_error_invalid_int(parsed_line->tokens[2],
+                               parsed_line->line_number);
+  if (!is_valid_integer(parsed_line->tokens[3]))
+      report_error_invalid_int(parsed_line->tokens[3],
+                               parsed_line->line_number);
+  if (!is_valid_positive_integer(parsed_line->tokens[4]))
+      report_error_invalid_positive_int(parsed_line->tokens[4],
+                                        parsed_line->line_number);
+  struct Antenna antenna;
+  strncpy(antenna.id, parsed_line->tokens[1], MAX_LENGTH_ID);
+  antenna.x = atoi(parsed_line->tokens[2]);
+  antenna.y = atoi(parsed_line->tokens[3]);
+  antenna.r = atoi(parsed_line->tokens[4]);
+  add_antenna(scene, &antenna);
+  return true;
 }
 
 /**
@@ -448,8 +584,6 @@ void load_scene_from_stdin(struct Scene* scene) {
   initialize_empty_scene(scene);
   char line[MAX_LENGTH + 1];
   bool first_line = true, last_line = false;
-  struct Building building;
-  struct Antenna antenna;
   int line_number = 1;
   while (fgets(line, MAX_LENGTH, stdin) != NULL) {
     last_line = false;
@@ -461,15 +595,15 @@ void load_scene_from_stdin(struct Scene* scene) {
     } else if (is_end_scene_line(line)) {
       last_line = true;
     } else {
-      if (is_building_line(line)) {
-        load_building_from_line(&building, line);
-        add_building(scene, &building);
-      } else if (is_antenna_line(line)) {
-        load_antenna_from_line(&antenna, line);
-        add_antenna(scene, &antenna);
-      } else {
-        report_error_unrecognized_line(line_number);
+      struct ParsedLine parsed_line;
+      parse_line(line, &parsed_line, line_number);
+      if (parsed_line.num_tokens == 0) {
+        fprintf(stderr, "error: line has no token\n");
+        exit(1);
       }
+      if (!load_building_from_parsed_line(&parsed_line, scene) &&
+          !load_antenna_from_parsed_line(&parsed_line, scene))
+        report_error_unrecognized_line(line_number);
     }
     ++line_number;
   }
@@ -526,6 +660,36 @@ bool have_antennas_same_position(const struct Antenna* antenna1,
 }
 
 /**
+ * Checks if the buildings of a scene are valid.
+ *
+ * @param scene  The scene to validate
+ */
+void validate_buildings(const struct Scene* scene) {
+  for (int b1 = 0; b1 < scene->num_buildings; ++b1)
+    for (int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
+      const struct Building* building1 = scene->buildings + b1,
+                           * building2 = scene->buildings + b2;
+      if (are_building_overlapping(building1, building2))
+        report_error_overlapping_buildings(building1->id, building2->id);
+    }
+}
+
+/**
+ * Checks if the antennas of a scene are valid.
+ *
+ * @param scene  The scene to validate
+ */
+void validate_antennas(const struct Scene* scene) {
+  for (int a1 = 0; a1 < scene->num_antennas; ++a1)
+    for (int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
+      const struct Antenna* antenna1 = scene->antennas + a1,
+                          * antenna2 = scene->antennas + a2;
+      if (have_antennas_same_position(antenna1, antenna2))
+        report_error_same_position_antennas(antenna1->id, antenna2->id);
+    }
+}
+
+/**
  * Checks if a scene is valid
  *
  * If the scene is invalid, an error is printed on stdout and the program exits
@@ -534,20 +698,8 @@ bool have_antennas_same_position(const struct Antenna* antenna1,
  * @param scene  The scene to validate
  */
 void validate_scene(const struct Scene* scene) {
-  for (int b1 = 0; b1 < scene->num_buildings; ++b1)
-    for (int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
-      const struct Building* building1 = scene->buildings + b1,
-                           * building2 = scene->buildings + b2;
-      if (are_building_overlapping(building1, building2))
-        report_error_overlapping_buildings(building1->id, building2->id);
-    }
-  for (int a1 = 0; a1 < scene->num_antennas; ++a1)
-    for (int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
-      const struct Antenna* antenna1 = scene->antennas + a1,
-                          * antenna2 = scene->antennas + a2;
-      if (have_antennas_same_position(antenna1, antenna2))
-        report_error_same_position_antennas(antenna1->id, antenna2->id);
-    }
+  validate_buildings(scene);
+  validate_antennas(scene);
 }
 
 // Subcommands processing
