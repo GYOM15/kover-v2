@@ -83,3 +83,18 @@ setup() {
   assert_failure
   assert_output "error: antennas a1 and a2 have the same position"
 }
+
+# Wrong lines
+# -----------
+
+@test "kover summarize reports an error when a building line has a wrong number of arguments" {
+  run kover summarize < "$examples_dir"/1b_wrong_number_of_arguments.invalid
+  assert_failure
+  assert_output "error: building line has wrong number of arguments (line #2)"
+}
+
+@test "kover summarize reports an error when an antenna line has the wrong number of arguments" {
+  run kover summarize < "$examples_dir"/1a_wrong_number_of_arguments.invalid
+  assert_failure
+  assert_output "error: antenna line has wrong number of arguments (line #2)"
+}
