@@ -140,6 +140,17 @@ void report_error_overlapping_buildings(const char* id1, const char* id2) {
 }
 
 /**
+ * Reports on stderr that two antennas have the same position
+ *
+ * @param id1  The identifier of the first antenna
+ * @param id2  The identifier of the second antenna
+ */
+void report_error_same_position_antennas(const char* id1, const char* id2) {
+  fprintf(stderr, "error: antennas %s and %s have the same position\n", id1, id2);
+  exit(1);
+}
+
+/**
  * Reports on stderr that the subcommand is mandatory
  */
 void report_error_mandatory_subcommand(void) {
@@ -504,6 +515,17 @@ bool are_building_overlapping(const struct Building* building1,
 }
 
 /**
+ * Indicates if two antennas have the same position
+ *
+ * @param antenna1  The first antenna
+ * @param antenna2  The second antenna
+ */
+bool have_antennas_same_position(const struct Antenna* antenna1,
+                                 const struct Antenna* antenna2) {
+  return antenna1->x == antenna2->x && antenna1->y == antenna2->y;
+}
+
+/**
  * Checks if a scene is valid
  *
  * If the scene is invalid, an error is printed on stdout and the program exits
@@ -518,6 +540,13 @@ void validate_scene(const struct Scene* scene) {
                            * building2 = scene->buildings + b2;
       if (are_building_overlapping(building1, building2))
         report_error_overlapping_buildings(building1->id, building2->id);
+    }
+  for (int a1 = 0; a1 < scene->num_antennas; ++a1)
+    for (int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
+      const struct Antenna* antenna1 = scene->antennas + a1,
+                          * antenna2 = scene->antennas + a2;
+      if (have_antennas_same_position(antenna1, antenna2))
+        report_error_same_position_antennas(antenna1->id, antenna2->id);
     }
 }
 

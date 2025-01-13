@@ -110,3 +110,9 @@ setup() {
   assert_failure
   assert_output "error: buildings b1 and b2 are overlapping"
 }
+
+@test "kover describe reports an error when two antennas have the same position" {
+  run kover describe < "$examples_dir"/2a_same_position.invalid
+  assert_failure
+  assert_output "error: antennas a1 and a2 have the same position"
+}
