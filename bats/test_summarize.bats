@@ -45,7 +45,7 @@ setup() {
   assert_output "A scene with 1 building and 1 antenna"
 }
 
-# Wrong usage
+# Wrong lines
 # -----------
 
 @test "kover summarize reports an error when first line is invalid" {
@@ -66,6 +66,9 @@ setup() {
   assert_output "error: last line must be exactly 'end scene'"
 }
 
+# Wrong buildings
+# ---------------
+
 @test "kover summarize reports an error when two buildings have same id" {
   run kover summarize < "$examples_dir"/2b_non_unique_id.invalid
   assert_failure
@@ -77,15 +80,6 @@ setup() {
   assert_failure
   assert_output "error: buildings b1 and b2 are overlapping"
 }
-
-@test "kover summarize reports an error when two antennas have the same position" {
-  run kover summarize < "$examples_dir"/2a_same_position.invalid
-  assert_failure
-  assert_output "error: antennas a1 and a2 have the same position"
-}
-
-# Wrong buildings
-# ---------------
 
 @test "kover summarize reports an error when a building line has a wrong number of arguments" {
   run kover summarize < "$examples_dir"/1b_wrong_number_of_arguments.invalid
@@ -125,6 +119,12 @@ setup() {
 
 # Wrong antennas
 # --------------
+
+@test "kover summarize reports an error when two antennas have the same position" {
+  run kover summarize < "$examples_dir"/2a_same_position.invalid
+  assert_failure
+  assert_output "error: antennas a1 and a2 have the same position"
+}
 
 @test "kover summarize reports an error when an antenna line has the wrong number of arguments" {
   run kover summarize < "$examples_dir"/1a_wrong_number_of_arguments.invalid
