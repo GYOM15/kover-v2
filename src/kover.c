@@ -135,6 +135,21 @@ void report_error_unrecognized_line(int line_number) {
 }
 
 /**
+ * Reports on stderr that a building line has the wrong number of arguments
+ *
+ * @param object       The object on the line
+ * @param line_number  The number of the unrecognized line
+ */
+void report_error_line_wrong_arguments_number(const char* object,
+                                              int line_number) {
+  fprintf(stderr,
+          "error: %s line has wrong number of arguments (line #%d)\n",
+          object,
+          line_number);
+  exit(1);
+}
+
+/**
  * Reports on stderr that the last line of a scene is invalid
  */
 void report_error_scene_last_line(void) {
@@ -160,7 +175,8 @@ void report_error_overlapping_buildings(const char* id1, const char* id2) {
  * @param id2  The identifier of the second antenna
  */
 void report_error_same_position_antennas(const char* id1, const char* id2) {
-  fprintf(stderr, "error: antennas %s and %s have the same position\n", id1, id2);
+  fprintf(stderr, "error: antennas %s and %s have the same position\n",
+          id1, id2);
   exit(1);
 }
 
@@ -389,12 +405,9 @@ bool load_building_from_parsed_line(const struct ParsedLine* parsed_line,
                                     struct Scene* scene) {
   if (strcmp(parsed_line->tokens[0], "building") != 0)
     return false;
-  if (parsed_line->num_tokens != 6) {
-    fprintf(stderr,
-            "error: building line has wrong number of arguments (line #%d)\n",
-            parsed_line->line_number);
-    exit(1);
-  }
+  if (parsed_line->num_tokens != 6)
+    report_error_line_wrong_arguments_number("building",
+                                             parsed_line->line_number);
   struct Building building;
   strncpy(building.id, parsed_line->tokens[1], MAX_LENGTH_ID);
   building.x = atoi(parsed_line->tokens[2]);
@@ -416,12 +429,9 @@ bool load_antenna_from_parsed_line(const struct ParsedLine* parsed_line,
                                    struct Scene* scene) {
   if (strcmp(parsed_line->tokens[0], "antenna") != 0)
     return false;
-  if (parsed_line->num_tokens != 5) {
-    fprintf(stderr,
-            "error: antenna line has wrong number of arguments (line #%d)\n",
-            parsed_line->line_number);
-    exit(1);
-  }
+  if (parsed_line->num_tokens != 5)
+    report_error_line_wrong_arguments_number("antenna",
+                                             parsed_line->line_number);
   struct Antenna antenna;
   strncpy(antenna.id, parsed_line->tokens[1], MAX_LENGTH_ID);
   antenna.x = atoi(parsed_line->tokens[2]);
