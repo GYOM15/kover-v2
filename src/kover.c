@@ -25,12 +25,12 @@ A scene is a text stream that must satisfy the following syntax:\n\
   3. Any line between the first and last line must either be a building line\n\
      or an antenna line\n\
   4. A building line can start with space characters, followed by an\n\
-     instruction of the form 'building ID X Y RX RY', where\n\
+     instruction of the form 'building ID X Y W H', where\n\
        ID is the building identifier\n\
        X is the x-coordinate of the building\n\
        Y is the y-coordinate of the building\n\
-       RX is the x-radius of the building\n\
-       RY is the y-radius of the building\n\
+       W is the half-width of the building\n\
+       H is the half-height of the building\n\
   5. An antenna line can start with space characters, followed by an\n\
      instruction of the form 'antenna ID X Y R', where\n\
        ID is the building identifier\n\
@@ -58,10 +58,10 @@ struct Building {
   int x;
   // The y coordinate of the building
   int y;
-  // The x radius of the building (half length in x direction)
-  int rx;
-  // The y radius of the building (half length in y direction)
-  int ry;
+  // The half width of the building (half length in x direction)
+  int w;
+  // The half height of the building (half length in y direction)
+  int h;
 };
 
 // An antenna
@@ -197,8 +197,8 @@ void add_building(struct Scene* scene, const struct Building* building) {
   strncpy(scene_building->id, building->id, MAX_LENGTH_ID);
   scene_building->x = building->x;
   scene_building->y = building->y;
-  scene_building->rx = building->rx;
-  scene_building->ry = building->ry;
+  scene_building->w = building->w;
+  scene_building->h = building->h;
   ++scene->num_buildings;
 }
 
@@ -256,7 +256,7 @@ void print_scene_buildings(const struct Scene* scene) {
   for (int b = 0; b < scene->num_buildings; ++b) {
     const struct Building* building = scene->buildings + b;
     printf("  building %s at %d %d with dimensions %d %d\n",
-           building->id, building->x, building->y, building->rx, building->ry);
+           building->id, building->x, building->y, building->w, building->h);
   }
 }
 
@@ -288,12 +288,12 @@ void print_scene_bounding_box(const struct Scene* scene) {
   for (int b = 0; b < scene->num_buildings; ++b) {
     int x = scene->buildings[b].x,
         y = scene->buildings[b].y,
-        rx = scene->buildings[b].rx,
-        ry = scene->buildings[b].ry;
-    xmin = x - rx < xmin ? x - rx : xmin;
-    xmax = x + rx > xmax ? x + rx : xmax;
-    ymin = y - ry < ymin ? y - ry : ymin;
-    ymax = y + ry > ymax ? y + ry : ymax;
+        w = scene->buildings[b].w,
+        h = scene->buildings[b].h;
+    xmin = x - w < xmin ? x - w : xmin;
+    xmax = x + w > xmax ? x + w : xmax;
+    ymin = y - h < ymin ? y - h : ymin;
+    ymax = y + h > ymax ? y + h : ymax;
   }
   for (int a = 0; a < scene->num_antennas; ++a) {
     int x = scene->antennas[a].x,
@@ -387,14 +387,14 @@ void load_building_from_line(struct Building* building, const char* line) {
   token = strtok(NULL, " ");
   if (token == NULL) return;
   building->y = atoi(token);
-  // 5th token should be rx
+  // 5th token should be w
   token = strtok(NULL, " ");
   if (token == NULL) return;
-  building->rx = atoi(token);
-  // 6th token should be ry
+  building->w = atoi(token);
+  // 6th token should be h
   token = strtok(NULL, " ");
   if (token == NULL) return;
-  building->ry = atoi(token);
+  building->h = atoi(token);
 }
 
 /**
@@ -493,14 +493,14 @@ bool are_intervals_overlapping(int a1, int b1, int a2, int b2) {
  */
 bool are_building_overlapping(const struct Building* building1,
                               const struct Building* building2) {
-  return are_intervals_overlapping(building1->x - building1->rx,
-                                   building1->x + building1->rx,
-                                   building2->x - building2->rx,
-                                   building2->x + building2->rx) &&
-         are_intervals_overlapping(building1->y - building1->ry,
-                                   building1->y + building1->ry,
-                                   building2->y - building2->ry,
-                                   building2->y + building2->ry);
+  return are_intervals_overlapping(building1->x - building1->w,
+                                   building1->x + building1->w,
+                                   building2->x - building2->w,
+                                   building2->x + building2->w) &&
+         are_intervals_overlapping(building1->y - building1->h,
+                                   building1->y + building1->h,
+                                   building2->y - building2->h,
+                                   building2->y + building2->h);
 }
 
 /**

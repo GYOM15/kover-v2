@@ -16,8 +16,11 @@ Plus formellement, un *building* est représenté par les éléments suivants:
 * `id`: un *identifiant* unique, sous forme de chaîne de caractères;
 * `x` et `y`: une *position* $`(x,y)`$ dans le plan, sous forme de deux entiers
   (négatifs, nuls ou positifs);
-* `rx` et `ry`: des *rayons* horizontal et vertical $`(r_x, r_y)`$, qui sont
+* `w` et `h`: une *demi-largeur* et une *demi-hauteur* $`(w, h)`$, qui sont
   des entiers strictement positifs.
+
+Ainsi, les 4 points du rectangle déterminé par un building sont $`(x - w,
+y - h)`$, $`(x + w, y - h)`$, $`(x - w, y + h)`$ et $`(x + w, y + h)`$.
 
 Une *antenne* est représentée par les éléments suivants:
 
@@ -45,13 +48,13 @@ syntaxe spécifique:
 3. Chaque ligne entre la première ligne et la dernière ligne doit être une
    ligne de type *building* ou une ligne de type *antenne*;
 4. Une ligne de type *building* doit correspondre à l'ERE
-   `^[:blank:]*building ID X Y RX RY$`,
+   `^[:blank:]*building ID X Y W H$`,
    où
     * `ID` est l'identifiant du building,
     * (`X`, `Y`) est la position du building, `X` et `Y` étant des nombres
       entiers et
-    * (`RX`, `RY`) est une paire de rayons horizontal et vertical, `RX` et
-      `RY` étant des nombres entiers strictement positifs;
+    * (`W`, `H`) est une paire de demi-largeur et demi-hauteur, `W` et `H`
+      étant des nombres entiers strictement positifs;
 5. Une ligne décrivant une antenne correspondre à l'ERE
    `^[:blank:]*antenna ID X Y R$`,
    où
