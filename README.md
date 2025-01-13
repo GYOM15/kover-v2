@@ -48,7 +48,7 @@ syntaxe spécifique:
 3. Chaque ligne entre la première ligne et la dernière ligne doit être une
    ligne de type *building* ou une ligne de type *antenne*;
 4. Une ligne de type *building* doit correspondre à l'ERE
-   `^[:blank:]*building ID X Y W H$`,
+   `^[:blank:]*building ID X Y W H[:blank:]*$`,
    où
     * `ID` est l'identifiant du building,
     * (`X`, `Y`) est la position du building, `X` et `Y` étant des nombres
@@ -56,7 +56,7 @@ syntaxe spécifique:
     * (`W`, `H`) est une paire de demi-largeur et demi-hauteur, `W` et `H`
       étant des nombres entiers strictement positifs;
 5. Une ligne décrivant une antenne correspondre à l'ERE
-   `^[:blank:]*antenna ID X Y R$`,
+   `^[:blank:]*antenna ID X Y R[:blank:]*$`,
    où
     * `ID` est l'identifiant de l'antenne,
     * (`X`, `Y`) est la position de l'antenne, où `X` et `Y` sont des nombres
