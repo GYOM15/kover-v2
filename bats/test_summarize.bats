@@ -110,3 +110,15 @@ setup() {
   assert_failure
   assert_output 'error: invalid identifier "a^" (line #2)'
 }
+
+@test "kover summarize reports an error when a building line has an invalid x" {
+  run kover summarize < "$examples_dir"/1b_wrong_x.invalid
+  assert_failure
+  assert_output 'error: invalid integer "a" (line #2)'
+}
+
+@test "kover summarize reports an error when a building line has an invalid y" {
+  run kover summarize < "$examples_dir"/1b_wrong_y.invalid
+  assert_failure
+  assert_output 'error: invalid integer "02" (line #2)'
+}
