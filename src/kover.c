@@ -24,15 +24,15 @@ A scene is a text stream that must satisfy the following syntax:\n\
   2. The last line must be exactly 'end scene'\n\
   3. Any line between the first and last line must either be a building line\n\
      or an antenna line\n\
-  4. A building line can start with space characters, followed by an\n\
-     instruction of the form 'building ID X Y W H', where\n\
+  4. A building line has the form 'building ID X Y W H' (with any number of\n\
+     blank characters before or after), where\n\
        ID is the building identifier\n\
        X is the x-coordinate of the building\n\
        Y is the y-coordinate of the building\n\
        W is the half-width of the building\n\
        H is the half-height of the building\n\
-  5. An antenna line can start with space characters, followed by an\n\
-     instruction of the form 'antenna ID X Y R', where\n\
+  5. An antenna line has the form 'antenna ID X Y R' (with any number of\n\
+     blank characters before or after), where\n\
        ID is the building identifier\n\
        X is the x-coordinate of the antenna\n\
        Y is the y-coordinate of the antenna\n\
