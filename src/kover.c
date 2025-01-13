@@ -520,6 +520,36 @@ bool have_antennas_same_position(const struct Antenna* antenna1,
 }
 
 /**
+ * Checks if the buildings of a scene are valid.
+ *
+ * @param scene  The scene to validate
+ */
+void validate_buildings(const struct Scene* scene) {
+  for (int b1 = 0; b1 < scene->num_buildings; ++b1)
+    for (int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
+      const struct Building* building1 = scene->buildings + b1,
+                           * building2 = scene->buildings + b2;
+      if (are_building_overlapping(building1, building2))
+        report_error_overlapping_buildings(building1->id, building2->id);
+    }
+}
+
+/**
+ * Checks if the antennas of a scene are valid.
+ *
+ * @param scene  The scene to validate
+ */
+void validate_antennas(const struct Scene* scene) {
+  for (int a1 = 0; a1 < scene->num_antennas; ++a1)
+    for (int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
+      const struct Antenna* antenna1 = scene->antennas + a1,
+                          * antenna2 = scene->antennas + a2;
+      if (have_antennas_same_position(antenna1, antenna2))
+        report_error_same_position_antennas(antenna1->id, antenna2->id);
+    }
+}
+
+/**
  * Checks if a scene is valid
  *
  * If the scene is invalid, an error is printed on stdout and the program exits
@@ -528,20 +558,8 @@ bool have_antennas_same_position(const struct Antenna* antenna1,
  * @param scene  The scene to validate
  */
 void validate_scene(const struct Scene* scene) {
-  for (int b1 = 0; b1 < scene->num_buildings; ++b1)
-    for (int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
-      const struct Building* building1 = scene->buildings + b1,
-                           * building2 = scene->buildings + b2;
-      if (are_building_overlapping(building1, building2))
-        report_error_overlapping_buildings(building1->id, building2->id);
-    }
-  for (int a1 = 0; a1 < scene->num_antennas; ++a1)
-    for (int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
-      const struct Antenna* antenna1 = scene->antennas + a1,
-                          * antenna2 = scene->antennas + a2;
-      if (have_antennas_same_position(antenna1, antenna2))
-        report_error_same_position_antennas(antenna1->id, antenna2->id);
-    }
+  validate_buildings(scene);
+  validate_antennas(scene);
 }
 
 // Subcommands processing
