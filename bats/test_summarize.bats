@@ -84,8 +84,8 @@ setup() {
   assert_output "error: antennas a1 and a2 have the same position"
 }
 
-# Wrong lines
-# -----------
+# Wrong buildings
+# ---------------
 
 @test "kover summarize reports an error when a building line has a wrong number of arguments" {
   run kover summarize < "$examples_dir"/1b_wrong_number_of_arguments.invalid
@@ -93,22 +93,10 @@ setup() {
   assert_output "error: building line has wrong number of arguments (line #2)"
 }
 
-@test "kover summarize reports an error when an antenna line has the wrong number of arguments" {
-  run kover summarize < "$examples_dir"/1a_wrong_number_of_arguments.invalid
-  assert_failure
-  assert_output "error: antenna line has wrong number of arguments (line #2)"
-}
-
 @test "kover summarize reports an error when a building line has an invalid identifier" {
   run kover summarize < "$examples_dir"/1b_wrong_id.invalid
   assert_failure
   assert_output 'error: invalid identifier "b^" (line #2)'
-}
-
-@test "kover summarize reports an error when an antenna line has an invalid identifier" {
-  run kover summarize < "$examples_dir"/1a_wrong_id.invalid
-  assert_failure
-  assert_output 'error: invalid identifier "a^" (line #2)'
 }
 
 @test "kover summarize reports an error when a building line has an invalid x" {
@@ -133,4 +121,37 @@ setup() {
   run kover summarize < "$examples_dir"/1b_wrong_h.invalid
   assert_failure
   assert_output 'error: invalid positive integer "-2" (line #2)'
+}
+
+# Wrong antennas
+# --------------
+
+@test "kover summarize reports an error when an antenna line has the wrong number of arguments" {
+  run kover summarize < "$examples_dir"/1a_wrong_number_of_arguments.invalid
+  assert_failure
+  assert_output "error: antenna line has wrong number of arguments (line #2)"
+}
+
+@test "kover summarize reports an error when an antenna line has an invalid identifier" {
+  run kover summarize < "$examples_dir"/1a_wrong_id.invalid
+  assert_failure
+  assert_output 'error: invalid identifier "a^" (line #2)'
+}
+
+@test "kover summarize reports an error when a antenna line has an invalid x" {
+  run kover summarize < "$examples_dir"/1a_wrong_x.invalid
+  assert_failure
+  assert_output 'error: invalid integer "00" (line #2)'
+}
+
+@test "kover summarize reports an error when a antenna line has an invalid y" {
+  run kover summarize < "$examples_dir"/1a_wrong_y.invalid
+  assert_failure
+  assert_output 'error: invalid integer "2t" (line #2)'
+}
+
+@test "kover summarize reports an error when a antenna line has an invalid r" {
+  run kover summarize < "$examples_dir"/1a_wrong_r.invalid
+  assert_failure
+  assert_output 'error: invalid positive integer "-1" (line #2)'
 }

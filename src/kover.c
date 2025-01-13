@@ -557,6 +557,15 @@ bool load_antenna_from_parsed_line(const struct ParsedLine* parsed_line,
   if (!is_valid_id(parsed_line->tokens[1]))
       report_error_invalid_identifier(parsed_line->tokens[1],
                                       parsed_line->line_number);
+  if (!is_valid_integer(parsed_line->tokens[2]))
+      report_error_invalid_int(parsed_line->tokens[2],
+                               parsed_line->line_number);
+  if (!is_valid_integer(parsed_line->tokens[3]))
+      report_error_invalid_int(parsed_line->tokens[3],
+                               parsed_line->line_number);
+  if (!is_valid_positive_integer(parsed_line->tokens[4]))
+      report_error_invalid_positive_int(parsed_line->tokens[4],
+                                        parsed_line->line_number);
   struct Antenna antenna;
   strncpy(antenna.id, parsed_line->tokens[1], MAX_LENGTH_ID);
   antenna.x = atoi(parsed_line->tokens[2]);
