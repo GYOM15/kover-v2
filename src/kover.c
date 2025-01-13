@@ -447,16 +447,18 @@ void load_scene_from_stdin(struct Scene* scene) {
       if (!is_begin_scene_line(line))
         report_error_scene_first_line();
       first_line = false;
-    } else if (is_building_line(line)) {
-      load_building_from_line(&building, line);
-      add_building(scene, &building);
-    } else if (is_antenna_line(line)) {
-      load_antenna_from_line(&antenna, line);
-      add_antenna(scene, &antenna);
     } else if (is_end_scene_line(line)) {
       last_line = true;
     } else {
-      report_error_unrecognized_line(line_number);
+      if (is_building_line(line)) {
+        load_building_from_line(&building, line);
+        add_building(scene, &building);
+      } else if (is_antenna_line(line)) {
+        load_antenna_from_line(&antenna, line);
+        add_antenna(scene, &antenna);
+      } else {
+        report_error_unrecognized_line(line_number);
+      }
     }
     ++line_number;
   }
