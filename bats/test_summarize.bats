@@ -98,3 +98,15 @@ setup() {
   assert_failure
   assert_output "error: antenna line has wrong number of arguments (line #2)"
 }
+
+@test "kover summarize reports an error when a building line has an invalid identifier" {
+  run kover summarize < "$examples_dir"/1b_wrong_id.invalid
+  assert_failure
+  assert_output 'error: invalid identifier "b^" (line #2)'
+}
+
+@test "kover summarize reports an error when an antenna line has an invalid identifier" {
+  run kover summarize < "$examples_dir"/1a_wrong_id.invalid
+  assert_failure
+  assert_output 'error: invalid identifier "a^" (line #2)'
+}

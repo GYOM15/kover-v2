@@ -102,6 +102,30 @@ struct ParsedLine {
   int line_number;
 };
 
+// Validation
+// ----------
+
+/**
+ * Indicates if a string is a valid identifier
+ *
+ * An identifier is valid if it completely matches the BRE
+ *
+ *   [a-zA-Z_][a-zA-Z0-1_]*
+ *
+ * @param s  The string to verify
+ * @return   true if and only if the string is a valid identifier
+ */
+bool is_valid_id(const char* s) {
+  if (*s == '\0' || (!isalpha(*s) && *s != '_'))
+    return false;
+  while (*s != '\0') {
+    if (!isalnum(*s) && *s != '_')
+      return false;
+    ++s;
+  }
+  return true;
+}
+
 // Error reporting
 // ---------------
 
@@ -113,6 +137,18 @@ struct ParsedLine {
  */
 void report_error_non_unique_identifiers(const char* object, const char* id) {
   fprintf(stderr, "error: %s identifier %s is non unique\n", object, id);
+  exit(1);
+}
+
+/**
+ * Reports on stderr that a given object has an invalid identifier
+ *
+ * @param id           The identifier
+ * @param line_number  The line number
+ */
+void report_error_invalid_identifier(const char* id, int line_number) {
+  fprintf(stderr, "error: invalid identifier \"%s\" (line #%d)\n", id,
+          line_number);
   exit(1);
 }
 
@@ -408,6 +444,9 @@ bool load_building_from_parsed_line(const struct ParsedLine* parsed_line,
   if (parsed_line->num_tokens != 6)
     report_error_line_wrong_arguments_number("building",
                                              parsed_line->line_number);
+  if (!is_valid_id(parsed_line->tokens[1]))
+      report_error_invalid_identifier(parsed_line->tokens[1],
+                                      parsed_line->line_number);
   struct Building building;
   strncpy(building.id, parsed_line->tokens[1], MAX_LENGTH_ID);
   building.x = atoi(parsed_line->tokens[2]);
@@ -432,6 +471,9 @@ bool load_antenna_from_parsed_line(const struct ParsedLine* parsed_line,
   if (parsed_line->num_tokens != 5)
     report_error_line_wrong_arguments_number("antenna",
                                              parsed_line->line_number);
+  if (!is_valid_id(parsed_line->tokens[1]))
+      report_error_invalid_identifier(parsed_line->tokens[1],
+                                      parsed_line->line_number);
   struct Antenna antenna;
   strncpy(antenna.id, parsed_line->tokens[1], MAX_LENGTH_ID);
   antenna.x = atoi(parsed_line->tokens[2]);
