@@ -46,6 +46,10 @@ A scene is a text stream that must satisfy the following syntax:\n\
 #define NUM_MAX_BUILDINGS 100
 // The maximum number of antennas in a scene
 #define NUM_MAX_ANTENNAS 100
+// The maximum number of tokens in a line
+#define MAX_NUM_TOKENS 6
+// The maximum lenght of a token in a line
+#define MAX_TOKEN_LENGTH 10
 
 // Types
 // -----
@@ -86,6 +90,14 @@ struct Scene {
   unsigned int num_antennas;
   // The antennas of the scene
   struct Antenna antennas[NUM_MAX_ANTENNAS];
+};
+
+// A parsed line
+struct ParsedLine {
+  // The number of parsed token
+  unsigned int num_tokens;
+  // The tokens
+  char tokens[MAX_NUM_TOKENS][MAX_TOKEN_LENGTH];
 };
 
 // Error reporting
@@ -342,101 +354,81 @@ bool is_end_scene_line(const char* line) {
 }
 
 /**
- * Indicates if the line is a building line
+ * Parses a line
+ *
+ * @param line         The line to parse
+ * @param parsed_line  The resulting parsed line
+ */
+void parse_line(const char* line, struct ParsedLine* parsed_line) {
+  char line_copy[MAX_LENGTH + 1];
+  strncpy(line_copy, line, MAX_LENGTH);
+  char *token = strtok(line_copy, " ");
+  int t = 0;
+  while (token != NULL) {
+    strncpy(parsed_line->tokens[t], token, MAX_TOKEN_LENGTH);
+    ++t;
+    token = strtok(NULL, " ");
+  }
+  parsed_line->num_tokens = t;
+}
+
+/**
+ * Indicates if the parsed line is the result of a valid building line
  *
  * A building line is a line that matches the BRE regex
  *
- *   ^[:blank:]*building
+ *   ^[:blank:]*building ID X Y W H[:blank:]*$
  *
- * @param line  The line to check
- * @return      true if and only if the line is valid
+ * @param parsed_line  The parsed line to check
+ * @return             true if and only if the parsed line is valid
  */
-bool is_building_line(const char* line) {
-  while (isblank(*line))
-    ++line;
-  return line != NULL && strncmp(line, "building", 8) == 0;
+bool is_building_parsed_line(const struct ParsedLine* parsed_line) {
+  return parsed_line->num_tokens == 6 &&
+         strcmp(parsed_line->tokens[0], "building") == 0;
 }
 
 /**
- * Indicates if the line is an antenna line
+ * Indicates if the parsed line is the result of a valid antenna line
  *
  * An antenna line is a line that matches the BRE regex
  *
- *   ^[:blank:]*antenna
+ *   ^[:blank:]*antenna ID X Y R[:blank:]*$
  *
- * @param line  The line to check
- * @return      true if and only if the line is valid
+ * @param parsed_line  The parsed line to check
+ * @return             true if and only if the parsed line is valid
  */
-bool is_antenna_line(const char* line) {
-  while (isblank(*line))
-    ++line;
-  return line != NULL && strncmp(line, "antenna", 7) == 0;
+bool is_antenna_parsed_line(const struct ParsedLine* parsed_line) {
+  return parsed_line->num_tokens == 5 &&
+         strcmp(parsed_line->tokens[0], "antenna") == 0;
 }
 
 /**
- * Loads a building from a line
+ * Loads a building from a parsed line
  *
- * @param building  The loaded building
- * @param line      The line
+ * @param building     The loaded building
+ * @param parsed_line  The parsed line
  */
-void load_building_from_line(struct Building* building, const char* line) {
-  char line_copy[MAX_LENGTH + 1];
-  strncpy(line_copy, line, MAX_LENGTH);
-  char *token;
-  // 1st token should be building
-  token = strtok(line_copy, " ");
-  if (token == NULL || strcmp(token, "building") != 0) return;
-  // 2nd token should be the identifier
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  strncpy(building->id, token, MAX_LENGTH_ID);
-  // 3rd token should be x
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  building->x = atoi(token);
-  // 4th token should be y
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  building->y = atoi(token);
-  // 5th token should be w
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  building->w = atoi(token);
-  // 6th token should be h
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  building->h = atoi(token);
+void load_building_from_parsed_line(struct Building* building,
+                                    const struct ParsedLine* parsed_line) {
+  strncpy(building->id, parsed_line->tokens[1], MAX_LENGTH_ID);
+  building->x = atoi(parsed_line->tokens[2]);
+  building->y = atoi(parsed_line->tokens[3]);
+  building->w = atoi(parsed_line->tokens[4]);
+  building->h = atoi(parsed_line->tokens[5]);
 }
 
 /**
- * Loads an antenna from a line
+ * Loads an antenna from a parsed line
  *
- * @param antenna  The loaded antenna
- * @param line     The line
+ * @param antenna      The loaded antenna
+ * @param parsed_line  The parsed line
  */
-void load_antenna_from_line(struct Antenna* antenna, const char* line) {
-  char line_copy[MAX_LENGTH + 1];
-  strncpy(line_copy, line, MAX_LENGTH);
-  char *token;
-  // 1st token should be antenna
-  token = strtok(line_copy, " ");
-  if (token == NULL || strcmp(token, "antenna") != 0) return;
-  // 2nd token should be the identifier
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  strncpy(antenna->id, token, MAX_LENGTH_ID);
-  // 3rd token should be x
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  antenna->x = atoi(token);
-  // 4th token should be y
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  antenna->y = atoi(token);
-  // 5th token should be r
-  token = strtok(NULL, " ");
-  if (token == NULL) return;
-  antenna->r = atoi(token);
+void load_antenna_from_parsed_line(struct Antenna* antenna,
+                                   const struct ParsedLine* parsed_line) {
+  strncpy(antenna->id, parsed_line->tokens[1], MAX_LENGTH_ID);
+  antenna->x = atoi(parsed_line->tokens[2]);
+  antenna->y = atoi(parsed_line->tokens[3]);
+  antenna->r = atoi(parsed_line->tokens[4]);
 }
 
 /**
@@ -448,8 +440,6 @@ void load_scene_from_stdin(struct Scene* scene) {
   initialize_empty_scene(scene);
   char line[MAX_LENGTH + 1];
   bool first_line = true, last_line = false;
-  struct Building building;
-  struct Antenna antenna;
   int line_number = 1;
   while (fgets(line, MAX_LENGTH, stdin) != NULL) {
     last_line = false;
@@ -461,11 +451,15 @@ void load_scene_from_stdin(struct Scene* scene) {
     } else if (is_end_scene_line(line)) {
       last_line = true;
     } else {
-      if (is_building_line(line)) {
-        load_building_from_line(&building, line);
+      struct ParsedLine parsed_line;
+      parse_line(line, &parsed_line);
+      struct Building building;
+      struct Antenna antenna;
+      if (is_building_parsed_line(&parsed_line)) {
+        load_building_from_parsed_line(&building, &parsed_line);
         add_building(scene, &building);
-      } else if (is_antenna_line(line)) {
-        load_antenna_from_line(&antenna, line);
+      } else if (is_antenna_parsed_line(&parsed_line)) {
+        load_antenna_from_parsed_line(&antenna, &parsed_line);
         add_antenna(scene, &antenna);
       } else {
         report_error_unrecognized_line(line_number);
