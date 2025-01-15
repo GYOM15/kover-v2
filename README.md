@@ -11,6 +11,25 @@ positionnement d'*antennes* de communication dans une *scène* afin de desservir
 des clients de façon adéquate. Les emplacements des clients sont représentés
 par des *buildings*, qui correspondent simplement à des boîtes rectangulaires.
 
+Le flux de texte suivant décrit une scène valide composée de trois buildings
+(identifiés par `b1`, `b2` et `b3`) et de deux antennes (identifiées par `a1`
+et `a2`):
+
+```
+begin scene
+  building b1 0 0 1 1
+  building b2 7 8 2 3
+  building b3 15 1 4 1
+  antenna a1 5 4 6
+  antenna a2 16 3 4
+end scene
+```
+
+Une représentation graphique de la scène ci-haut est disponible dans le fichier
+SVG suivant:
+
+![Une scène de 3 buildings et 2 antennes](doc/scene.svg)
+
 Plus formellement, un *building* est représenté par les éléments suivants:
 
 * `id`: un *identifiant* unique, sous forme de chaîne de caractères;
@@ -73,25 +92,6 @@ les contraintes suivantes:
   avec l'ERE `0|([-]?[1-9][0-9]*)`;
 * Un *entier strictement positif* est une chaîne de caractères qui a une
   correspondance complète avec l'ERE `[1-9][0-9]*`;
-
-Par exemple, le flux de texte suivant décrit une scène valide composée de trois
-buildings (identifiés par `b1`, `b2` et `b3`) et de deux antennes (identifiées
-par `a1` et `a2`):
-
-```
-begin scene
-  building b1 0 0 1 1
-  building b2 7 8 2 3
-  building b3 15 1 4 1
-  antenna a1 5 4 6
-  antenna a2 16 3 4
-end scene
-```
-
-Une représentation graphique de la scène ci-haut est disponible dans le fichier
-SVG suivant:
-
-![Une scène de 3 buildings et 2 antennes](doc/scene.svg)
 
 Des exemples de scènes valides et invalides sont donnés dans le répertoire
 [`examples`](examples).
