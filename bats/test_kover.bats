@@ -10,12 +10,12 @@ setup() {
 
 @test "kover without subcommand reports wrong usage" {
   run kover
-  assert_failure
+  [ "$status" -eq 1 ]
   assert_output "error: subcommand is mandatory"
 }
 
 @test "kover with unrecognized subcommand reports wrong usage" {
   run kover thing
-  assert_failure
+  [ "$status" -eq 1 ]
   assert_output "error: subcommand 'thing' is not recognized"
 }
