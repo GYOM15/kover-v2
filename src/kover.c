@@ -48,7 +48,7 @@ A scene is a text stream that must satisfy the following syntax:\n\
 #define NUM_MAX_ANTENNAS 100
 // The maximum number of tokens in a line
 #define MAX_NUM_TOKENS 6
-// The maximum lenght of a token in a line
+// The maximum length of a token in a line
 #define MAX_TOKEN_LENGTH 10
 
 // Types
