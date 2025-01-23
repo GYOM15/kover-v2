@@ -337,7 +337,8 @@ void add_building(struct Scene* scene, const struct Building* building) {
   while (b < scene->num_buildings &&
          strcmp(building->id, scene->buildings[b].id) > 0)
     ++b;
-  if (strcmp(building->id, scene->buildings[b].id) == 0)
+  if (b < scene->num_buildings &&
+      strcmp(building->id, scene->buildings[b].id) == 0)
     report_error_non_unique_identifiers("building", building->id);
   for (int b2 = scene->num_buildings; b2 > b; --b2)
     scene->buildings[b2] = scene->buildings[b2 - 1];
@@ -361,7 +362,8 @@ void add_antenna(struct Scene* scene, const struct Antenna* antenna) {
   while (a < scene->num_antennas &&
          strcmp(antenna->id, scene->antennas[a].id) > 0)
     ++a;
-  if (strcmp(antenna->id, scene->antennas[a].id) == 0)
+  if (a < scene->num_antennas &&
+      strcmp(antenna->id, scene->antennas[a].id) == 0)
     report_error_non_unique_identifiers("antenna", antenna->id);
   for (int a2 = scene->num_antennas; a2 > a; --a2)
     scene->antennas[a2] = scene->antennas[a2 - 1];
