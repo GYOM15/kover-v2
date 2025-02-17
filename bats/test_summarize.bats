@@ -120,6 +120,12 @@ setup() {
 # Wrong antennas
 # --------------
 
+@test "kover summarize reports an error when two antennas have same id" {
+  run kover summarize < "$examples_dir"/2a_non_unique_id.invalid
+  [ "$status" -eq 1 ]
+  assert_output "error: antenna identifier a1 is non unique"
+}
+
 @test "kover summarize reports an error when two antennas have the same position" {
   run kover summarize < "$examples_dir"/2a_same_position.invalid
   [ "$status" -eq 1 ]
