@@ -141,7 +141,7 @@ void add_building(struct Scene* scene, const struct Building* building) {
   if (b < scene->num_buildings &&
       strcmp(building->id, scene->buildings[b].id) == 0)
     report_error_non_unique_identifiers("building", building->id);
-  for (int b2 = scene->num_buildings; b2 > b; --b2)
+  for (unsigned int b2 = scene->num_buildings; b2 > b; --b2)
     scene->buildings[b2] = scene->buildings[b2 - 1];
   struct Building* scene_building = scene->buildings + b;
   strncpy(scene_building->id, building->id, MAX_LENGTH_ID);
@@ -166,7 +166,7 @@ void add_antenna(struct Scene* scene, const struct Antenna* antenna) {
   if (a < scene->num_antennas &&
       strcmp(antenna->id, scene->antennas[a].id) == 0)
     report_error_non_unique_identifiers("antenna", antenna->id);
-  for (int a2 = scene->num_antennas; a2 > a; --a2)
+  for (unsigned int a2 = scene->num_antennas; a2 > a; --a2)
     scene->antennas[a2] = scene->antennas[a2 - 1];
   struct Antenna* scene_antenna = scene->antennas + a;
   strncpy(scene_antenna->id, antenna->id, MAX_LENGTH_ID);
@@ -204,7 +204,7 @@ void print_scene_summary(const struct Scene* scene) {
  * @param scene  The scene whose buildings are printed
  */
 void print_scene_buildings(const struct Scene* scene) {
-  for (int b = 0; b < scene->num_buildings; ++b) {
+  for (unsigned int b = 0; b < scene->num_buildings; ++b) {
     const struct Building* building = scene->buildings + b;
     printf("  building %s at %d %d with dimensions %d %d\n",
            building->id, building->x, building->y, building->w, building->h);
@@ -217,7 +217,7 @@ void print_scene_buildings(const struct Scene* scene) {
  * @param scene  The scene whose antennas are printed
  */
 void print_scene_antennas(const struct Scene* scene) {
-  for (int a = 0; a < scene->num_antennas; ++a) {
+  for (unsigned int a = 0; a < scene->num_antennas; ++a) {
     const struct Antenna* antenna = scene->antennas + a;
     printf("  antenna %s at %d %d with range %d\n",
            antenna->id, antenna->x, antenna->y, antenna->r);
@@ -236,7 +236,7 @@ void print_scene_bounding_box(const struct Scene* scene) {
   }
   int xmin = INT_MAX, xmax = INT_MIN,
       ymin = INT_MAX, ymax = INT_MIN;
-  for (int b = 0; b < scene->num_buildings; ++b) {
+  for (unsigned int b = 0; b < scene->num_buildings; ++b) {
     int x = scene->buildings[b].x,
         y = scene->buildings[b].y,
         w = scene->buildings[b].w,
@@ -246,7 +246,7 @@ void print_scene_bounding_box(const struct Scene* scene) {
     ymin = y - h < ymin ? y - h : ymin;
     ymax = y + h > ymax ? y + h : ymax;
   }
-  for (int a = 0; a < scene->num_antennas; ++a) {
+  for (unsigned int a = 0; a < scene->num_antennas; ++a) {
     int x = scene->antennas[a].x,
         y = scene->antennas[a].y,
         r = scene->antennas[a].r;
@@ -468,8 +468,8 @@ bool have_antennas_same_position(const struct Antenna* antenna1,
  * @param scene  The scene to validate
  */
 void validate_buildings(const struct Scene* scene) {
-  for (int b1 = 0; b1 < scene->num_buildings; ++b1)
-    for (int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
+  for (unsigned int b1 = 0; b1 < scene->num_buildings; ++b1)
+    for (unsigned int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
       const struct Building* building1 = scene->buildings + b1,
                            * building2 = scene->buildings + b2;
       if (are_building_overlapping(building1, building2))
@@ -483,8 +483,8 @@ void validate_buildings(const struct Scene* scene) {
  * @param scene  The scene to validate
  */
 void validate_antennas(const struct Scene* scene) {
-  for (int a1 = 0; a1 < scene->num_antennas; ++a1)
-    for (int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
+  for (unsigned int a1 = 0; a1 < scene->num_antennas; ++a1)
+    for (unsigned int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
       const struct Antenna* antenna1 = scene->antennas + a1,
                           * antenna2 = scene->antennas + a2;
       if (have_antennas_same_position(antenna1, antenna2))
