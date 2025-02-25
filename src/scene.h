@@ -64,6 +64,13 @@ struct Scene {
  */
 void initialize_empty_scene(struct Scene* scene);
 
+/**
+ * Loads a scene from the standard input
+ *
+ * @param scene  The resulting scene
+ */
+void load_scene_from_stdin(struct Scene* scene);
+
 // Validation
 // ----------
 
