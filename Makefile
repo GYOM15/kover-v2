@@ -14,5 +14,5 @@ clean:
 	$(MAKE) clean -C src
 	rm -rf bin
 
-test: $(exec)
+test: build
 	$(MAKE) -C bats
