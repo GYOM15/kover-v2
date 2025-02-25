@@ -1,21 +1,23 @@
-CFLAGS = -Wall -Wextra
-
 .PHONY: build clean
 
-build: kover
+CFLAGS = -Wall -Wextra
+exec = kover
+modules = scene validation
+modules_c_files = $(patsubst %,%.c,$(modules))
+modules_h_files = $(patsubst %,%.h,$(modules))
+modules_o_files = $(patsubst %,%.o,$(modules))
 
-kover: kover.o scene.o validation.o
-	gcc kover.o scene.o validation.o -o kover
+build: $(exec)
 
-kover.o: kover.c
-	gcc $(CFLAGS) -c kover.c
+$(exec): $(exec).o $(modules_o_files)
+	gcc $^ -o $@
 
-scene.o: scene.h scene.c
-	gcc $(CFLAGS) -c scene.c
+$(exec).o: $(exec).c
+	gcc $(CFLAGS) -c $<
 
-validation.o: validation.h validation.c
-	gcc $(CFLAGS) -c validation.c
+$(modules_o_files): %.o: %.c %.h
+	gcc $(CFLAGS) -c $<
 
 clean:
-	rm -f *.o
-	rm -f kover
+	rm -f $(modules_o_files)
+	rm -f $(exec)
