@@ -1,17 +1,17 @@
-exec = bin/kover
-main = src/kover.c
+.PHONY: build clean test
 
-.PHONY: bindir build clean test
+exec = kover
 
-$(exec): bindir $(main)
-	gcc $(main) -o $(exec)
+build:
+	$(MAKE) build -C src
+	$(MAKE) bin
+	cp src/$(exec) bin/$(exec)
 
-build: $(exec)
-
-bindir:
+bin:
 	mkdir -p bin
 
 clean:
+	$(MAKE) clean -C src
 	rm -rf bin
 
 test: $(exec)
