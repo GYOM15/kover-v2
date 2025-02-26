@@ -83,8 +83,8 @@ syntaxe spécifique:
     * `R` est la portée de l'antenne, qui est un nombre entier strictement
       positif.
 
-Votre programme doit reconnaître les identifiants et les nombres entiers selon
-les contraintes suivantes:
+Le programme reconnaît les identifiants et les nombres entiers selon les
+contraintes suivantes:
 
 * Un *identifiant* est une chaîne de caractères qui a une correspondance
   complète avec l'ERE `[a-zA-Z_][a-zA-Z0-9_]*`;
@@ -123,11 +123,14 @@ Une fois les dépendances installées, on peut compiler l'application `kover`
 
 ```sh
 $ make
+# Ou de façon équivalente
+$ make build
 ```
 
-Cette commande produit l'exécutable `kover` dans le répertoire `bin`.
+Cette commande produit entre autres l'exécutable principal `kover` dans le
+répertoire `bin`.
 
-Il est possible en tout temps de supprimer l'exécutable:
+Il est possible en tout temps de nettoyer les fichiers générés, incluant l'exécutable, à l'aide de la commande suivante:
 
 ```sh
 $ make clean
@@ -140,6 +143,8 @@ On peut aussi lancer la suite de tests Bats à l'aide de `make`:
 ```sh
 $ make test
 ```
+
+Un rapport Bats est alors affiché sur la sortie standard.
 
 ## Utilisation
 
