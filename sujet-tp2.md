@@ -122,8 +122,8 @@ et `house`. Les paramètres qui déterminent une maison sont les mêmes que les
 les commandes existantes (`bounding-box`, `describe`, `summarize` et
 `validate`) lorsqu'elles rapportent des informations sur la sortie standard.
 
-Plus spécifiquement, vous devez apporter minimalement les modifications
-suivantes:
+Plus spécifiquement, vous devez minimalement apporter les modifications
+suivantes, en plaçant tous vos *commits* sur la branche `introduce-house`:
 
 1. Étendre le module `scene` (`scene.h`/`scene.c`) afin de supporter ces
    nouvelles modifications
@@ -180,7 +180,8 @@ house h1: A
 house h2: C
 ```
 
-Vous devez minimalement effectuer les actions suivantes:
+Plus spécifiquement, vous devez minimalement apporter les modifications
+suivantes, en plaçant tous vos *commits* sur la branche `cover-quality`:
 
 1. Étendre la base de code afin de supporter cette nouvelle sous-commande
 2. Mettre à jour les tests fonctionnels (tests Bats) existants s'il y a lieu
@@ -251,9 +252,9 @@ milieux bilingues.
 
 ## Barème
 
-Les critères d'évaluation sont les suivants:
+Les points sont répartis selon la grille suivante:
 
-| Critère             |  Points |
+| Élément             |  Points |
 |:--------------------|--------:|
 | Tâche 1             |     /30 |
 | Tâche 2             |     /30 |
