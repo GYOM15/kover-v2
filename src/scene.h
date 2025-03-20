@@ -117,6 +117,16 @@ bool are_building_overlapping(const struct Building* building1,
                              const struct Building* building2);
 
 /**
+ * Indicates if two houses are overlapping
+ *
+ * @param house1  The first house
+ * @param house2  The second house
+ * @return        true if and only if they overlap
+ */
+bool are_houses_overlapping(const struct House* house1,
+  const struct House* house2);
+
+/**
 * Indicates if two antennas have the same position
 *
 * @param antenna1  The first antenna
