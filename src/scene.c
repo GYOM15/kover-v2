@@ -429,6 +429,7 @@ void validate_scene(const struct Scene* scene) {
   init_validation_error(&error);
   
   if (!is_scene_valid(scene, &error)) {
+    printf("not ok\n");
     fprintf(stderr, "error: %s\n", error.message);
     exit(1);
   }
