@@ -136,6 +136,29 @@ bool validate_buildings(const struct Scene* scene, struct ValidationError* error
   return false;
 }
 
+/**
+ * Checks if there are overlapping houses in the scene
+ *
+ * @param scene  The scene to validate
+ * @return       true if an overlap is found, false otherwise
+ */
+bool validate_houses(const struct Scene* scene, struct ValidationError* error) {
+  for (unsigned int h1 = 0; h1 < scene->num_houses; ++h1) {
+    for (unsigned int h2 = h1 + 1; h2 < scene->num_houses; ++h2) {
+      const struct House* house1 = scene->houses + h1;
+      const struct House* house2 = scene->houses + h2;
+      if (are_houses_overlapping(house1, house2)) {
+        snprintf(error->message, sizeof(error->message), 
+                "houses %s and %s are overlapping", 
+                house1->id, house2->id);
+        error->has_error = true;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 // Loading
 // -------
 
