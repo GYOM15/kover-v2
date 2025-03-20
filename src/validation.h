@@ -79,6 +79,17 @@ bool is_valid_positive_integer(const char* s);
 // ---------------
 
 /**
+ * Report an error and exit with error code
+ * 
+ * This function prints "not ok" to stdout, the error message to stderr,
+ * and exits with status code 1.
+ * 
+ * @param format   The format string for the error message
+ * @param ...      The arguments for the format string
+ */
+void report_error(const char* format, ...);
+
+/**
  * Reports on stderr that a given object identifier is not unique
  *
  * @param object  The object

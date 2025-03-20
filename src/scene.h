@@ -2,6 +2,7 @@
 #define SCENE_H_
 
 #include <stdbool.h>
+#include "validation.h"
 
 // Constants
 // ---------
@@ -103,6 +104,24 @@ void load_scene_from_stdin(struct Scene* scene);
  * @param scene  The scene to validate
  */
 void validate_scene(const struct Scene* scene);
+
+/**
+ * Checks if there are any overlapping structures in the scene
+ *
+ * @param scene  The scene to validate
+ * @param error  Structure to store error information
+ * @return       true if an overlap is found, false otherwise
+ */
+bool validate_structures_overlaps(const struct Scene* scene, struct ValidationError* error);
+
+/**
+ * Checks if there are antennas with the same position
+ *
+ * @param scene  The scene to validate
+ * @param error  Structure to store error information
+ * @return       true if same position antennas are found, false otherwise
+ */
+bool validate_antennas(const struct Scene* scene, struct ValidationError* error);
 
 /**
  * Indicates if two buildings are overlapping
