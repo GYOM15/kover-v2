@@ -96,6 +96,15 @@ void validate_scene(const struct Scene* scene);
 bool are_building_overlapping(const struct Building* building1,
                              const struct Building* building2);
 
+/**
+* Indicates if two antennas have the same position
+*
+* @param antenna1  The first antenna
+* @param antenna2  The second antenna
+*/
+bool have_antennas_same_position(const struct Antenna* antenna1,
+                                const struct Antenna* antenna2);
+
 // Accessors
 // ---------
 
