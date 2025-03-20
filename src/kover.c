@@ -112,6 +112,29 @@ void run_validate_subcommand(void) {
   }
 }
 
+/**
+ * Runs the quality subcommand
+ */
+void run_quality_subcommand(void) {
+  struct Scene scene;
+  load_scene_from_stdin(&scene);
+  validate_scene(&scene);
+  
+  for (unsigned int b = 0; b < scene.num_buildings; ++b) {
+    const struct Building* building = &scene.buildings[b];
+    int corners = count_building_covered_corners(building, &scene);
+    char quality = get_coverage_quality(corners);
+    printf("building %s: %c\n", building->id, quality);
+  }
+  
+  for (unsigned int h = 0; h < scene.num_houses; ++h) {
+    const struct House* house = &scene.houses[h];
+    int corners = count_house_covered_corners(house, &scene);
+    char quality = get_coverage_quality(corners);
+    printf("house %s: %c\n", house->id, quality);
+  }
+}
+
 // Main function
 // -------------
 
@@ -135,6 +158,8 @@ int main(int argc, char* argv[]) {
     run_summarize_subcommand();
   else if (strcmp(subcommand, "validate") == 0)
     run_validate_subcommand();
+  else if (strcmp(subcommand, "quality") == 0)
+    run_quality_subcommand();
   else
     report_error_unrecognized_subcommand(subcommand);
   return 0;
