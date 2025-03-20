@@ -84,6 +84,18 @@ void load_scene_from_stdin(struct Scene* scene);
  */
 void validate_scene(const struct Scene* scene);
 
+/**
+ * Indicates if two buildings are overlapping
+ *
+ * Two building are overlapping if their intersection has a strictly positive
+ * area.
+ *
+ * @param building1  The first building
+ * @param building2  The second building
+ */
+bool are_building_overlapping(const struct Building* building1,
+                             const struct Building* building2);
+
 // Accessors
 // ---------
 
