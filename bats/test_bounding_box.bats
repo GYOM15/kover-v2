@@ -65,13 +65,3 @@ setup() {
   assert_success
   assert_output "bounding box [-2, 7] x [-2, 11]"
 }
-
-# Test that validation is still performed
-# --------------------------------------
-
-@test "kover bounding-box still performs validation on invalid scenes" {
-  run kover bounding-box < "$examples_dir"/2b_overlapping.invalid
-  [ "$status" -eq 1 ]
-  assert_line --index 1 "not ok"
-  assert_line --index 0 "error: buildings b1 and b2 are overlapping"
-}

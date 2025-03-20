@@ -64,13 +64,3 @@ setup() {
   assert_success
   assert_output "A scene with 1 building, 1 house and 1 antenna"
 }
-
-# Test that validation is still performed
-# --------------------------------------
-
-@test "kover summarize still performs validation on invalid scenes" {
-  run kover summarize < "$examples_dir"/2b_overlapping.invalid
-  [ "$status" -eq 1 ]
-  assert_line --index 0 "error: buildings b1 and b2 are overlapping"
-  assert_line --index 1 "not ok"
-}

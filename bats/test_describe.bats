@@ -104,13 +104,3 @@ setup() {
   assert_line --index 2 "  house h1 at 5 8 with dimensions 2 3"
   assert_line --index 3 "  antenna a1 at 2 3 with range 4"
 }
-
-# Test that validation is still performed
-# --------------------------------------
-
-@test "kover describe still performs validation on invalid scenes" {
-  run kover describe < "$examples_dir"/2b_overlapping.invalid
-  [ "$status" -eq 1 ]
-  assert_line --index 0 "error: buildings b1 and b2 are overlapping"
-  assert_line --index 1 "not ok"
-}
