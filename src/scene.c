@@ -445,19 +445,32 @@ bool scene_is_empty(const struct Scene* scene) {
 }
 
 void print_scene_summary(const struct Scene* scene) {
-  if (scene->num_buildings == 0 && scene->num_antennas == 0) {
+  if (scene_is_empty(scene)) {
     puts("An empty scene");
     return;
-  }
+  } 
   printf("A scene with ");
-  if (scene->num_buildings > 0)
-    printf("%d building%s", scene->num_buildings,
-           scene->num_buildings > 1 ? "s" : "");
-  if (scene->num_buildings > 0 && scene->num_antennas > 0)
-    printf(" and ");
-  if (scene->num_antennas > 0)
-    printf("%d antenna%s", scene->num_antennas,
-           scene->num_antennas > 1 ? "s" : "");
+  bool first = true;
+  if (scene->num_buildings > 0) {
+    printf("%d building%s", scene->num_buildings, scene->num_buildings > 1 ? "s" : "");
+    first = false;
+  }
+  if (scene->num_houses > 0) {
+    if (!first) {
+      if (scene->num_antennas == 0)
+        printf(" and ");
+      else
+        printf(", ");
+    }
+    printf("%d house%s", scene->num_houses, scene->num_houses > 1 ? "s" : "");
+    first = false;
+  }
+  if (scene->num_antennas > 0) {
+    if (!first)
+      printf(" and ");
+    
+    printf("%d antenna%s", scene->num_antennas, scene->num_antennas > 1 ? "s" : "");
+  }
   printf("\n");
 }
 
