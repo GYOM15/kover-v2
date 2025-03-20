@@ -81,6 +81,22 @@ bool have_antennas_same_position(const struct Antenna* antenna1,
   return antenna1->x == antenna2->x && antenna1->y == antenna2->y;
 }
 
+/**
+ * Vérifie si un bâtiment et une maison se chevauchent
+ */
+bool are_building_house_overlapping(const struct Building *building,
+  const struct House *house)
+{
+return are_intervals_overlapping(building->x - building->w,
+ building->x + building->w,
+ house->x - house->w,
+ house->x + house->w) &&
+are_intervals_overlapping(building->y - building->h,
+ building->y + building->h,
+ house->y - house->h,
+ house->y + house->h);
+}
+
 // Loading
 // -------
 
