@@ -680,3 +680,17 @@ int count_building_covered_corners(const struct Building* building, const struct
     building->x, building->y, building->w, building->h, scene
   );
 }
+
+/**
+ * Counts the number of covered corners of a house.
+ * The corners of the house are checked to see if they are within the range of any antenna.
+ * 
+ * @param house The house to check.
+ * @param scene The scene containing the antennas.
+ * @return The number of covered corners for the house.
+ */
+int count_house_covered_corners(const struct House* house, const struct Scene* scene) {
+  return count_structure_covered_corners(
+    house->x, house->y, house->w, house->h, scene
+  );
+}
