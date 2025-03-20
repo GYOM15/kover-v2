@@ -694,3 +694,20 @@ int count_house_covered_corners(const struct House* house, const struct Scene* s
     house->x, house->y, house->w, house->h, scene
   );
 }
+
+/**
+ * Gets the quality grade based on the number of covered corners.
+ * The quality is assigned based on how many of the structure's corners are covered by antennas.
+ * 
+ * @param covered_corners The number of corners covered by antennas.
+ * @return A character representing the coverage quality: 'A' (best) to 'E' (worst).
+ */
+char get_coverage_quality(int covered_corners) {
+  switch (covered_corners) {
+    case 4: return 'A';
+    case 3: return 'B';
+    case 2: return 'C';
+    case 1: return 'D';
+    default: return 'E';
+  }
+}
