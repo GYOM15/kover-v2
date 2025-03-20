@@ -439,7 +439,9 @@ void validate_scene(const struct Scene* scene) {
 // ---------
 
 bool scene_is_empty(const struct Scene* scene) {
-  return scene->num_buildings == 0 && scene->num_antennas == 0;
+  return scene->num_buildings == 0 && 
+         scene->num_houses == 0 && 
+         scene->num_antennas == 0;
 }
 
 void print_scene_summary(const struct Scene* scene) {
