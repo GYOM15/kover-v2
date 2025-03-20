@@ -64,6 +64,10 @@ struct Scene {
   unsigned int num_buildings;
   // The buildings of the scene
   struct Building buildings[NUM_MAX_BUILDINGS];
+  // The number of houses in the scene
+  unsigned int num_houses;
+  // The houses of the scene
+  struct House houses[NUM_MAX_HOUSES];
   // The number of antennas in the scene
   unsigned int num_antennas;
   // The antennas of the scene
