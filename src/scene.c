@@ -627,3 +627,20 @@ static int count_structure_covered_corners(int x, int y, int w, int h, const str
   
   return count;
 }
+
+/**
+ * Calculates the squared distance between two points.
+ * This is used to avoid the overhead of calculating square roots when comparing distances.
+ * 
+ * @param x1 The x-coordinate of the first point.
+ * @param y1 The y-coordinate of the first point.
+ * @param x2 The x-coordinate of the second point.
+ * @param y2 The y-coordinate of the second point.
+ * @return The squared distance between the two points.
+ */
+static int distance_squared(int x1, int y1, int x2, int y2) {
+  int dx = x1 - x2;
+  int dy = y1 - y2;
+  
+  return dx * dx + dy * dy;
+}
