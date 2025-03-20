@@ -12,6 +12,8 @@
 #define NUM_MAX_BUILDINGS 100
 // The maximum number of antennas in a scene
 #define NUM_MAX_ANTENNAS 100
+// The maximum number of houses in a scene
+#define NUM_MAX_HOUSES 100
 
 // Types
 // -----
