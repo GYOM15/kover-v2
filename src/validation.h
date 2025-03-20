@@ -3,8 +3,18 @@
 
 #include <stdbool.h>
 
+// Forward declaration of struct Scene
+struct Scene;
+
+// Validation error structure to store error information
+struct ValidationError {
+    bool has_error;
+    char message[256];
+};
+
 // Validations
 // -----------
+
 
 /**
  * Indicates if a string is a valid identifier
