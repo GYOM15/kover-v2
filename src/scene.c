@@ -303,6 +303,46 @@ bool load_building_from_parsed_line(const struct ParsedLine* parsed_line,
 }
 
 /**
+ * Loads a house from a parsed line
+ *
+ * @param parsed_line  The parsed line
+ * @param scene        The scene in which the house is loaded
+ * @return             true if and only if the loading was successful
+ */
+bool load_house_from_parsed_line(const struct ParsedLine *parsed_line,
+                                 struct Scene *scene)
+{
+  if (strcmp(parsed_line->tokens[0], "house") != 0)
+    return false;
+  if (parsed_line->num_tokens != 6)
+    report_error_line_wrong_arguments_number("house",
+                                             parsed_line->line_number);
+  if (!is_valid_id(parsed_line->tokens[1]))
+    report_error_invalid_identifier(parsed_line->tokens[1],
+                                    parsed_line->line_number);
+  if (!is_valid_integer(parsed_line->tokens[2]))
+    report_error_invalid_int(parsed_line->tokens[2],
+                             parsed_line->line_number);
+  if (!is_valid_integer(parsed_line->tokens[3]))
+    report_error_invalid_int(parsed_line->tokens[3],
+                             parsed_line->line_number);
+  if (!is_valid_positive_integer(parsed_line->tokens[4]))
+    report_error_invalid_positive_int(parsed_line->tokens[4],
+                                      parsed_line->line_number);
+  if (!is_valid_positive_integer(parsed_line->tokens[5]))
+    report_error_invalid_positive_int(parsed_line->tokens[5],
+                                      parsed_line->line_number);
+  struct House house;
+  strncpy(house.id, parsed_line->tokens[1], MAX_LENGTH_ID);
+  house.x = atoi(parsed_line->tokens[2]);
+  house.y = atoi(parsed_line->tokens[3]);
+  house.w = atoi(parsed_line->tokens[4]);
+  house.h = atoi(parsed_line->tokens[5]);
+  add_house(scene, &house);
+  return true;
+}
+
+/**
  * Loads an antenna from a parsed line
  *
  * @param parsed_line  The parsed line
