@@ -385,6 +385,7 @@ bool load_antenna_from_parsed_line(const struct ParsedLine* parsed_line,
 
 void initialize_empty_scene(struct Scene* scene) {
   scene->num_buildings = 0;
+  scene->num_houses = 0;
   scene->num_antennas = 0;
 }
 
