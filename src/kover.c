@@ -83,6 +83,25 @@ void run_summarize_subcommand(void) {
   print_scene_summary(&scene);
 }
 
+/**
+ * Runs the validate subcommand
+ */
+void run_validate_subcommand(void) {
+  struct Scene scene;
+  struct ValidationError error;
+  
+  load_scene_from_stdin(&scene);
+  init_validation_error(&error);
+  
+  if (is_scene_valid(&scene, &error)) {
+    printf("ok\n");
+  } else {
+    printf("not ok\n");
+    fprintf(stderr, "error: %s\n", error.message);
+    exit(1);
+  }
+}
+
 // Main function
 // -------------
 
@@ -104,6 +123,8 @@ int main(int argc, char* argv[]) {
     run_help_subcommand();
   else if (strcmp(subcommand, "summarize") == 0)
     run_summarize_subcommand();
+  else if (strcmp(subcommand, "validate") == 0)
+    run_validate_subcommand();
   else
     report_error_unrecognized_subcommand(subcommand);
   return 0;
