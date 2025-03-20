@@ -561,6 +561,25 @@ void add_building(struct Scene* scene, const struct Building* building) {
   ++scene->num_buildings;
 }
 
+void add_house(struct Scene* scene, const struct House* house) {
+  unsigned int h = 0;
+  while (h < scene->num_houses &&
+         strcmp(house->id, scene->houses[h].id) > 0)
+    ++h;
+  if (h < scene->num_houses &&
+      strcmp(house->id, scene->houses[h].id) == 0)
+    report_error_non_unique_identifiers("house", house->id);
+  for (unsigned int h2 = scene->num_houses; h2 > h; --h2)
+    scene->houses[h2] = scene->houses[h2 - 1];
+  struct House* scene_house = scene->houses + h;
+  strncpy(scene_house->id, house->id, MAX_LENGTH_ID);
+  scene_house->x = house->x;
+  scene_house->y = house->y;
+  scene_house->w = house->w;
+  scene_house->h = house->h;
+  ++scene->num_houses;
+}
+
 void add_antenna(struct Scene* scene, const struct Antenna* antenna) {
   unsigned int a = 0;
   while (a < scene->num_antennas &&
