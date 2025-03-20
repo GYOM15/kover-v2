@@ -407,12 +407,13 @@ void load_scene_from_stdin(struct Scene* scene) {
       struct ParsedLine parsed_line;
       parse_line(line, &parsed_line, line_number);
       if (parsed_line.num_tokens == 0) {
-        fprintf(stderr, "error: line has no token\n");
-        exit(1);
+        report_error("line has no token\n");
       }
       if (!load_building_from_parsed_line(&parsed_line, scene) &&
-          !load_antenna_from_parsed_line(&parsed_line, scene))
-        report_error_unrecognized_line(line_number);
+          !load_house_from_parsed_line(&parsed_line, scene) &&
+          !load_antenna_from_parsed_line(&parsed_line, scene)){
+            report_error_unrecognized_line(line_number);
+          }  
     }
     ++line_number;
   }
