@@ -97,6 +97,22 @@ are_intervals_overlapping(building->y - building->h,
  house->y + house->h);
 }
 
+/**
+ * Vérifie si deux maisons se chevauchent
+ */
+bool are_houses_overlapping(const struct House *house1,
+  const struct House *house2)
+{
+return are_intervals_overlapping(house1->x - house1->w,
+         house1->x + house1->w,
+         house2->x - house2->w,
+         house2->x + house2->w) &&
+are_intervals_overlapping(house1->y - house1->h,
+         house1->y + house1->h,
+         house2->y - house2->h,
+         house2->y + house2->h);
+}
+
 // Loading
 // -------
 
