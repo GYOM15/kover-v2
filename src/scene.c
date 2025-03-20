@@ -666,3 +666,17 @@ bool is_point_covered(int x, int y, const struct Scene* scene) {
   }
   return false;
 }
+
+/**
+ * Counts the number of covered corners of a building.
+ * The corners of the building are checked to see if they are within the range of any antenna.
+ * 
+ * @param building The building to check.
+ * @param scene The scene containing the antennas.
+ * @return The number of covered corners for the building.
+ */
+int count_building_covered_corners(const struct Building* building, const struct Scene* scene) {
+  return count_structure_covered_corners(
+    building->x, building->y, building->w, building->h, scene
+  );
+}
