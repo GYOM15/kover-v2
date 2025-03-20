@@ -11,6 +11,7 @@ test:
 
 count:
 	bats-core/bin/bats -c test_kover.bats
+	bats-core/bin/bats -c test_validate.bats
 	bats-core/bin/bats -c test_bounding_box.bats
 	bats-core/bin/bats -c test_describe.bats
 	bats-core/bin/bats -c test_help.bats
