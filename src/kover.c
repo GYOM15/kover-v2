@@ -72,6 +72,7 @@ void run_describe_subcommand(void) {
   validate_scene(&scene);
   print_scene_summary(&scene);
   print_scene_buildings(&scene);
+  print_scene_houses(&scene);
   print_scene_antennas(&scene);
 }
 
