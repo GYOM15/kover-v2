@@ -54,7 +54,39 @@ void init_validation_error(struct ValidationError* error) {
   error->message[0] = '\0';
 }
 
-
+bool is_scene_valid(const struct Scene* scene, struct ValidationError* error) {
+  // Check for overlapping buildings
+  for (unsigned int b1 = 0; b1 < scene->num_buildings; ++b1) {
+    for (unsigned int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
+      const struct Building* building1 = scene->buildings + b1;
+      const struct Building* building2 = scene->buildings + b2;
+      if (are_building_overlapping(building1, building2)) {
+        snprintf(error->message, sizeof(error->message), 
+                "buildings %s and %s are overlapping", 
+                building1->id, building2->id);
+        error->has_error = true;
+        return false;
+      }
+    }
+  }
+  
+  // Check for antennas with same position
+  for (unsigned int a1 = 0; a1 < scene->num_antennas; ++a1) {
+    for (unsigned int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
+      const struct Antenna* antenna1 = scene->antennas + a1;
+      const struct Antenna* antenna2 = scene->antennas + a2;
+      if (have_antennas_same_position(antenna1, antenna2)) {
+        snprintf(error->message, sizeof(error->message), 
+                "antennas %s and %s have the same position", 
+                antenna1->id, antenna2->id);
+        error->has_error = true;
+        return false;
+      }
+    }
+  }
+  
+  return true;
+}
 
 const char* get_validation_error(const struct ValidationError* error) {
   if (error->has_error) {
