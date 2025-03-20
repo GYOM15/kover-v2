@@ -482,6 +482,14 @@ void print_scene_buildings(const struct Scene* scene) {
   }
 }
 
+void print_scene_houses(const struct Scene* scene) {
+  for (unsigned int h = 0; h < scene->num_houses; ++h) {
+    const struct House* house = scene->houses + h;
+    printf("  house %s at %d %d with dimensions %d %d\n",
+           house->id, house->x, house->y, house->w, house->h);
+  }
+}
+
 void print_scene_antennas(const struct Scene* scene) {
   for (unsigned int a = 0; a < scene->num_antennas; ++a) {
     const struct Antenna* antenna = scene->antennas + a;
