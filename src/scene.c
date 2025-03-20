@@ -597,3 +597,33 @@ void add_antenna(struct Scene* scene, const struct Antenna* antenna) {
   scene_antenna->r = antenna->r;
   ++scene->num_antennas;
 }
+
+// Utility functions for counting covered corners
+// ------------------------------------------------
+
+/**
+ * Counts the number of covered corners of a structure (building or house).
+ * A corner is considered covered if it is within the range of any antenna.
+ * 
+ * @param x The x-coordinate of the structure's center.
+ * @param y The y-coordinate of the structure's center.
+ * @param w The half-width of the structure.
+ * @param h The half-height of the structure.
+ * @param scene The scene containing the antennas.
+ * @return The number of corners covered by antennas.
+ */
+static int count_structure_covered_corners(int x, int y, int w, int h, const struct Scene* scene) {
+  int count = 0;
+
+  int x_min = x - w;
+  int x_max = x + w;
+  int y_min = y - h;
+  int y_max = y + h;
+  
+  if (is_point_covered(x_min, y_min, scene)) count++;
+  if (is_point_covered(x_min, y_max, scene)) count++;
+  if (is_point_covered(x_max, y_min, scene)) count++;
+  if (is_point_covered(x_max, y_max, scene)) count++;
+  
+  return count;
+}

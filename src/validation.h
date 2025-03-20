@@ -139,8 +139,7 @@ void report_error_unrecognized_line(int line_number);
  * @param object       The object on the line
  * @param line_number  The number of the unrecognized line
  */
-void report_error_line_wrong_arguments_number(const char* object,
-                                              int line_number);
+void report_error_line_wrong_arguments_number(const char* object, int line_number);
 
 /**
  * Reports on stderr that the last line of a scene is invalid
