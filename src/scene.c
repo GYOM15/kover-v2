@@ -515,6 +515,18 @@ void print_scene_bounding_box(const struct Scene* scene) {
     ymin = y - h < ymin ? y - h : ymin;
     ymax = y + h > ymax ? y + h : ymax;
   }
+  // Check houses
+  for (unsigned int h = 0; h < scene->num_houses; ++h) {
+    int x = scene->houses[h].x,
+        y = scene->houses[h].y,
+        w = scene->houses[h].w,
+        h_val = scene->houses[h].h;
+    xmin = x - w < xmin ? x - w : xmin;
+    xmax = x + w > xmax ? x + w : xmax;
+    ymin = y - h_val < ymin ? y - h_val : ymin;
+    ymax = y + h_val > ymax ? y + h_val : ymax;
+  }
+  // Check antennas
   for (unsigned int a = 0; a < scene->num_antennas; ++a) {
     int x = scene->antennas[a].x,
         y = scene->antennas[a].y,
