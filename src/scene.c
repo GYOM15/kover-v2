@@ -159,6 +159,64 @@ bool validate_houses(const struct Scene* scene, struct ValidationError* error) {
   return false;
 }
 
+/**
+ * Checks if there are overlapping buildings and houses in the scene
+ *
+ * @param scene  The scene to validate
+ * @return       true if an overlap is found, false otherwise
+ */
+bool validate_buildings_houses_overlap(const struct Scene* scene, struct ValidationError* error) {
+  for (unsigned int b = 0; b < scene->num_buildings; ++b) {
+    for (unsigned int h = 0; h < scene->num_houses; ++h) {
+      const struct Building* building = scene->buildings + b;
+      const struct House* house = scene->houses + h;
+      if (are_building_house_overlapping(building, house)) {
+        snprintf(error->message, sizeof(error->message), 
+                "buildings %s and %s are overlapping", 
+                building->id, house->id);
+        error->has_error = true;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Checks for any overlapping structures in the scene
+ *
+ * @param scene  The scene to validate
+ * @return       true if an overlap is found, false otherwise
+ */
+bool validate_structures_overlaps(const struct Scene* scene, struct ValidationError* error) {
+  return validate_buildings(scene, error) ||
+         validate_houses(scene, error) ||
+         validate_buildings_houses_overlap(scene, error);
+}
+
+/**
+ * Checks if the antennas of a scene are valid.
+ *
+ * @param scene  The scene to validate
+ */
+bool validate_antennas(const struct Scene* scene, struct ValidationError* error) {
+  for (unsigned int a1 = 0; a1 < scene->num_antennas; ++a1) {
+    for (unsigned int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
+      const struct Antenna* antenna1 = scene->antennas + a1;
+      const struct Antenna* antenna2 = scene->antennas + a2;
+      
+      if (have_antennas_same_position(antenna1, antenna2)) {
+        snprintf(error->message, sizeof(error->message), 
+                "antennas %s and %s have the same position", 
+                antenna1->id, antenna2->id);
+        error->has_error = true;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 // Loading
 // -------
 
