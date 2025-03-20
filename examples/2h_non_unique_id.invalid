@@ -1,0 +1,4 @@
+begin scene
+  house h1 0 0 1 1
+  house h1 5 8 2 3
+end scene
