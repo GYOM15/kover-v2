@@ -644,3 +644,25 @@ static int distance_squared(int x1, int y1, int x2, int y2) {
   
   return dx * dx + dy * dy;
 }
+
+/**
+ * Checks if a point is covered by any antenna in the scene.
+ * A point is covered if its distance to an antenna is less than or equal to the antenna's radius.
+ * 
+ * @param x The x-coordinate of the point.
+ * @param y The y-coordinate of the point.
+ * @param scene The scene containing the antennas.
+ * @return true if the point is covered by an antenna, false otherwise.
+ */
+bool is_point_covered(int x, int y, const struct Scene* scene) {
+  for (unsigned int a = 0; a < scene->num_antennas; ++a) {
+    const struct Antenna* antenna = &scene->antennas[a];
+    int dist_squared = distance_squared(x, y, antenna->x, antenna->y);
+    int radius_squared = antenna->r * antenna->r;
+
+    if (dist_squared <= radius_squared) {
+      return true;
+    }
+  }
+  return false;
+}
