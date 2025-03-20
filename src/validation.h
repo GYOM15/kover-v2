@@ -15,6 +15,29 @@ struct ValidationError {
 // Validations
 // -----------
 
+/**
+ * Initialize validation error structure
+ * 
+ * @param error  The validation error structure to initialize
+ */
+void init_validation_error(struct ValidationError* error);
+
+/**
+ * Validates a scene without exiting on error
+ *
+ * @param scene  The scene to validate
+ * @param error  Structure to store error information if validation fails
+ * @return       true if the scene is valid, false otherwise
+ */
+bool is_scene_valid(const struct Scene* scene, struct ValidationError* error);
+
+/**
+ * Gets the last validation error message
+ * 
+ * @param error  The validation error structure
+ * @return       The error message from the validation
+ */
+const char* get_validation_error(const struct ValidationError* error);
 
 /**
  * Indicates if a string is a valid identifier
