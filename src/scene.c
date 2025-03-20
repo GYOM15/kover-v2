@@ -81,36 +81,6 @@ bool have_antennas_same_position(const struct Antenna* antenna1,
   return antenna1->x == antenna2->x && antenna1->y == antenna2->y;
 }
 
-/**
- * Checks if the buildings of a scene are valid.
- *
- * @param scene  The scene to validate
- */
-void validate_buildings(const struct Scene* scene) {
-  for (unsigned int b1 = 0; b1 < scene->num_buildings; ++b1)
-    for (unsigned int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
-      const struct Building* building1 = scene->buildings + b1,
-                           * building2 = scene->buildings + b2;
-      if (are_building_overlapping(building1, building2))
-        report_error_overlapping_buildings(building1->id, building2->id);
-    }
-}
-
-/**
- * Checks if the antennas of a scene are valid.
- *
- * @param scene  The scene to validate
- */
-void validate_antennas(const struct Scene* scene) {
-  for (unsigned int a1 = 0; a1 < scene->num_antennas; ++a1)
-    for (unsigned int a2 = a1 + 1; a2 < scene->num_antennas; ++a2) {
-      const struct Antenna* antenna1 = scene->antennas + a1,
-                          * antenna2 = scene->antennas + a2;
-      if (have_antennas_same_position(antenna1, antenna2))
-        report_error_same_position_antennas(antenna1->id, antenna2->id);
-    }
-}
-
 // Loading
 // -------
 
@@ -277,8 +247,13 @@ void load_scene_from_stdin(struct Scene* scene) {
 // ----------
 
 void validate_scene(const struct Scene* scene) {
-  validate_buildings(scene);
-  validate_antennas(scene);
+  struct ValidationError error;
+  init_validation_error(&error);
+  
+  if (!is_scene_valid(scene, &error)) {
+    fprintf(stderr, "error: %s\n", error.message);
+    exit(1);
+  }
 }
 
 // Accessors
