@@ -203,6 +203,14 @@ void print_scene_bounding_box(const struct Scene* scene);
 void add_building(struct Scene* scene, const struct Building* building);
 
 /**
+ * Adds a house to a scene
+ *
+ * @param scene  The scene to which the house is added
+ * @param house  The house to add
+ */
+void add_house(struct Scene* scene, const struct House* house);
+
+/**
  * Adds an antenna to a scene
  *
  * @param scene    The scene to which the antenna is added
