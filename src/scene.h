@@ -237,4 +237,43 @@ void add_house(struct Scene* scene, const struct House* house);
  */
 void add_antenna(struct Scene* scene, const struct Antenna* antenna);
 
+// Quality
+// -------
+
+/**
+ * Checks if a point is covered by any antenna
+ *
+ * @param x      The x-coordinate of the point
+ * @param y      The y-coordinate of the point
+ * @param scene  The scene with antennas
+ * @return       true if the point is covered, false otherwise
+ */
+bool is_point_covered(int x, int y, const struct Scene* scene);
+
+/**
+ * Counts covered corners of a building
+ *
+ * @param building  The building
+ * @param scene     The scene with antennas
+ * @return          The number of corners covered (0-4)
+ */
+int count_building_covered_corners(const struct Building* building, const struct Scene* scene);
+
+/**
+ * Counts covered corners of a house
+ *
+ * @param house  The house
+ * @param scene  The scene with antennas
+ * @return       The number of corners covered (0-4)
+ */
+int count_house_covered_corners(const struct House* house, const struct Scene* scene);
+
+/**
+ * Gets the quality grade based on covered corners
+ *
+ * @param covered_corners  The number of covered corners (0-4)
+ * @return                 The quality grade ('A' to 'E')
+ */
+char get_coverage_quality(int covered_corners);
+
 #endif
