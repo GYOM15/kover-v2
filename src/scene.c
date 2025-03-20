@@ -85,32 +85,55 @@ bool have_antennas_same_position(const struct Antenna* antenna1,
  * Vérifie si un bâtiment et une maison se chevauchent
  */
 bool are_building_house_overlapping(const struct Building *building,
-  const struct House *house)
+                                    const struct House *house)
 {
-return are_intervals_overlapping(building->x - building->w,
- building->x + building->w,
- house->x - house->w,
- house->x + house->w) &&
-are_intervals_overlapping(building->y - building->h,
- building->y + building->h,
- house->y - house->h,
- house->y + house->h);
+  return are_intervals_overlapping(building->x - building->w,
+                                   building->x + building->w,
+                                   house->x - house->w,
+                                   house->x + house->w) &&
+         are_intervals_overlapping(building->y - building->h,
+                                   building->y + building->h,
+                                   house->y - house->h,
+                                   house->y + house->h);
 }
 
 /**
  * Vérifie si deux maisons se chevauchent
  */
 bool are_houses_overlapping(const struct House *house1,
-  const struct House *house2)
+                            const struct House *house2)
 {
-return are_intervals_overlapping(house1->x - house1->w,
-         house1->x + house1->w,
-         house2->x - house2->w,
-         house2->x + house2->w) &&
-are_intervals_overlapping(house1->y - house1->h,
-         house1->y + house1->h,
-         house2->y - house2->h,
-         house2->y + house2->h);
+  return are_intervals_overlapping(house1->x - house1->w,
+                                   house1->x + house1->w,
+                                   house2->x - house2->w,
+                                   house2->x + house2->w) &&
+         are_intervals_overlapping(house1->y - house1->h,
+                                   house1->y + house1->h,
+                                   house2->y - house2->h,
+                                   house2->y + house2->h);
+}
+
+/**
+ * Checks if there are overlapping buildings in the scene
+ *
+ * @param scene  The scene to validate
+ * @return       true if an overlap is found, false otherwise
+ */
+bool validate_buildings(const struct Scene* scene, struct ValidationError* error) {
+  for (unsigned int b1 = 0; b1 < scene->num_buildings; ++b1) {
+    for (unsigned int b2 = b1 + 1; b2 < scene->num_buildings; ++b2) {
+      const struct Building* building1 = scene->buildings + b1;
+      const struct Building* building2 = scene->buildings + b2;
+      if (are_building_overlapping(building1, building2)) {
+        snprintf(error->message, sizeof(error->message), 
+                "buildings %s and %s are overlapping", 
+                building1->id, building2->id);
+        error->has_error = true;
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 // Loading
