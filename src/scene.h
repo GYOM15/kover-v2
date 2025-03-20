@@ -171,6 +171,13 @@ void print_scene_summary(const struct Scene* scene);
 void print_scene_buildings(const struct Scene* scene);
 
 /**
+ * Prints the houses of the scene to stdout
+ *
+ * @param scene  The scene whose houses are printed
+ */
+void print_scene_houses(const struct Scene* scene);
+
+/**
  * Prints the antenna of the scene to stdout
  *
  * @param scene  The scene whose antennas are printed
