@@ -32,6 +32,20 @@ struct Building {
   int h;
 };
 
+// A house (similar to a building)
+struct House {
+  // The identifier of the house
+  char id[MAX_LENGTH_ID + 1];
+  // The x coordinate of the house
+  int x;
+  // The y coordinate of the house
+  int y;
+  // The half width of the house (half length in x direction)
+  int w;
+  // The half height of the house (half length in y direction)
+  int h;
+};
+
 // An antenna
 struct Antenna {
   // The identifier of the antenna
